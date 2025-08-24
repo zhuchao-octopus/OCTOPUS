@@ -262,6 +262,7 @@ var
   CmdDir: String;
 
 function IsLeftMouseButtonDown: Boolean;
+function ReadFileToStream(FileName: String): TFileStream;
 
 implementation
 
@@ -272,7 +273,7 @@ begin
   Result := GetKeyState(MK_LBUTTON) < 0;
 end;
 
-function readFileToStream(FileName: String): TFileStream;
+function ReadFileToStream(FileName: String): TFileStream;
 var
   FileStream: TFileStream;
 begin
@@ -488,7 +489,7 @@ var
   delayTimesTick: Int64;
   appended: Boolean;
   tick_diff: Int64;
-  diff_count:Integer;
+  diff_count: Integer;
 begin
   j := 0;
   s := '';
@@ -533,7 +534,7 @@ begin
         Continue;
 
       s := FOcComPortObj.StringInternelCache.Lines.Strings[FCachedCounterIndex];
-      diff_count :=  FOcComPortObj.GetCachedLinesCount() -  FCachedCounterIndex;
+      diff_count := FOcComPortObj.GetCachedLinesCount() - FCachedCounterIndex;
 
       if ((Trim(s) = '') or (FCachedCounterIndex = 0) or (diff_count <= 2) or (Length(Trim(s)) < 20)) then
       begin
@@ -558,8 +559,8 @@ begin
       FOcComPortObj.LogBottomMod(s, True, FOcComPortObj.IsLogAtBottom());
       INC(FCachedCounterIndex); // ÏÂÒ»ÐÐ
 
-      //if FOcComPortObj.GetCachedLinesCount() > 0 then
-      //  FOcComPortObj.StringInternelCache.Lines.Delete(0);
+      // if FOcComPortObj.GetCachedLinesCount() > 0 then
+      // FOcComPortObj.StringInternelCache.Lines.Delete(0);
 
       if Assigned(FOcComPortObj.FCallBackFun) then
         FOcComPortObj.FCallBackFun();

@@ -3,13 +3,15 @@
 interface
 
 uses
-  System.SysUtils, System.StrUtils, Winapi.Windows, Winapi.Messages, Winapi.RichEdit, System.Classes, Vcl.Graphics, Vcl.Controls,
+  Winapi.Windows, Winapi.Messages, Winapi.RichEdit, System.SysUtils, System.StrUtils, System.Classes, Vcl.Graphics, Vcl.Controls,
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.ClipBrd,
   Vcl.ToolWin, Vcl.ActnList, System.Actions, System.ImageList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
   Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes, SHDocVw, SyncObjs, Vcl.Printers;
 
 type
   TEventCallBackFuntion = Procedure(Msg: String) of object;
+
+  TLogType = (ltSend, ltRecv, ltInfo, ltError, ltNone);
 
   TMyMemo = class(TMemo)
   private
@@ -58,8 +60,17 @@ type
   private
     FTAG: String;
     FSourceBytes: TBytes;
-    FLock: TCriticalSection; // 用于线程同步的临界区对象
     FPrevTimestamp: TDateTime;
+
+    FSendColor: TColor;
+    FReceiveColor: TColor;
+    FDefaultColor: TColor;
+    FLock: TCriticalSection;
+    FLogQueue: TStringList;
+    FCacheList: TStringList;
+    FIsDestroying: Boolean;
+    procedure FlushLogQueue;
+    function DetectTextFileEncoding(const FileName: string): TEncoding;
   protected
   public
     FStyle: Integer;
@@ -78,15 +89,19 @@ type
     function GetLastLine(): String;
     function GetLine(Line: Integer): String;
     function IsModifiedByExternal(): Boolean;
+    function LoadFrom(PathFileName: String): Boolean; overload;
+    function ExistLocalFile(): Boolean;
+
     procedure Clear();
-    procedure Log(const Msg: String);
+    procedure AppendLog(const Text: string; LogType: TLogType);
+    procedure Log(const Msg: string; LogType: TLogType = ltRecv);
     procedure LogLine(const Msg: String; Line: Integer);
     procedure LogEndLine(const Msg: String);
     procedure LogBuffer(const Buffer: array of Byte; Count: Integer);
 
     procedure SaveTo(const PathFileName: String); overload;
     procedure SaveTo(const PathFileName: String; Encoding: TEncoding); overload;
-    procedure LoadFrom(PathFileName: String); overload;
+
     procedure LoadFrom(PathFileName: String; Encoding: TEncoding); overload;
     procedure ConvertEncoding(TargetEncoding: TEncoding);
     procedure ConvertToUTF8WithBOM();
@@ -96,6 +111,9 @@ type
     procedure SetHexadecimalMode(); overload;
     procedure SetHexadecimalMode(HexMode: Boolean); overload;
 
+    property SendColor: TColor read FSendColor write FSendColor;
+    property ReceiveColor: TColor read FReceiveColor write FReceiveColor;
+    property DefaultColor: TColor read FDefaultColor write FDefaultColor;
   published
   end;
 
@@ -140,11 +158,9 @@ type
   published
   end;
 
-function DetectTextFileEncoding(const FileName: string): TEncoding;
-
 implementation
 
-uses DataEngine;
+uses DataEngine, Winapi.ShellAPI, System.UITypes, System.IOUtils;
 
 /// //////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////////////////////////////////////////////////////
@@ -565,75 +581,156 @@ constructor TMyRichEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FLock := TCriticalSection.Create;
+  FLogQueue := TStringList.Create;
+  FCacheList := TStringList.Create; // 只创建一次
+
+  FIsDestroying := false;
+  FSendColor := clGreen;
+  FReceiveColor := clBlue;
+  FDefaultColor := clBlack;
 end;
 
 destructor TMyRichEdit.Destroy;
 begin
-  FLock.Free;
+  FIsDestroying := true;
+  FLock.Enter;
+  try
+    FLogQueue.Clear;
+    FCacheList.Clear;
+  finally
+    FLock.Leave;
+  end;
+  FreeAndNil(FLogQueue);
+  FreeAndNil(FCacheList);
+  FreeAndNil(FLock);
   inherited Destroy;
 end;
 
 procedure TMyRichEdit.Clear();
 begin
-  FLock.Enter;
-  try
-    Self.Lines.Clear;
-  finally
-    FLock.Leave;
-  end;
-end;
-
-procedure TMyRichEdit.Log(const Msg: String);
-begin
-
-  FLock.Enter;
-  try
-    try
-      Self.Lines.Append(Msg);
-    Except
-      on E: Exception do
+  if TThread.CurrentThread.ThreadID = MainThreadID then
+    Lines.Clear
+  else
+    TThread.Queue(nil,
+      procedure
       begin
-        if Assigned(EventCallBackFuntion) then
-          EventCallBackFuntion(E.Message);
-      end;
-    end;
+        if not FIsDestroying then
+          Lines.Clear;
+      end);
+end;
+
+procedure TMyRichEdit.AppendLog(const Text: string; LogType: TLogType);
+var
+  AColor: TColor;
+begin
+  case LogType of
+    ltSend:
+      AColor := clBlue; // 发送 - 蓝色
+    ltRecv:
+      AColor := clGreen; // 接收 - 绿色
+    ltInfo:
+      AColor := clBlack; // 普通信息 - 黑色
+    ltError:
+      AColor := clRed; // 错误 - 红色
+    ltNone:
+      AColor := clWindowText; // 黑白风格兼容（系统默认前景色）
+  else
+    AColor := clWindowText;
+  end;
+
+  // 确保可以写
+  ReadOnly := false;
+
+  // 插入时设置颜色
+  SelStart := GetTextLen;
+  SelLength := 0;
+  SelAttributes.Color := AColor;
+  SelText := Text + sLineBreak; // 插入文本（带颜色）
+
+  // 滚动到底部（可选）
+  // SelStart := GetTextLen;
+  // Perform(EM_SCROLLCARET, 0, 0);
+end;
+
+procedure TMyRichEdit.FlushLogQueue;
+var
+  i: Integer;
+  tmp: TStringList;
+  LogTypeValue: TLogType;
+  ColorToUse: TColor;
+begin
+  if FIsDestroying then
+    Exit;
+  LogTypeValue := ltNone;
+  FLock.Enter;
+  try
+    if FLogQueue.Count = 0 then
+      Exit;
+    tmp := FCacheList; // FCacheList 是类里的成员，预先创建好
+    tmp.Assign(FLogQueue);
+    FLogQueue.Clear;
   finally
     FLock.Leave;
   end;
 
-  /// Except
-  /// ShowMessage('This error message is due to ??');
-  /// if Assigned(EventCallBackFuntion) then
-  /// EventCallBackFuntion(Self);
-  /// end;
+  for i := 0 to tmp.Count - 1 do
+  begin
+    if Assigned(tmp.Objects[i]) then
+      LogTypeValue := TLogType(Integer(tmp.Objects[i]));
+
+    AppendLog(tmp[1], LogTypeValue);
+  end;
+
+  // SelStart := Length(Text);
+  // Perform(EM_SCROLLCARET, 0, 0);
+  tmp.Free;
 end;
 
-procedure TMyRichEdit.LogLine(const Msg: String; Line: Integer);
+procedure TMyRichEdit.Log(const Msg: string; LogType: TLogType = ltRecv);
+var
+  ColorToUse: TColor;
 begin
-  if (Self.Lines.Count > 0) and (Line >= 0) and (Line < Self.Lines.Count) then
+  if FIsDestroying then
+    Exit;
+
+  if TThread.CurrentThread.ThreadID = MainThreadID then
+  begin
+    // Lines.Add(Msg);
+    AppendLog(Msg, LogType);
+  end
+  else
   begin
     FLock.Enter;
     try
-      Lines.Strings[Line] := Msg;
+      FLogQueue.AddObject(Msg, TObject(LogType));
     finally
       FLock.Leave;
     end;
+    TThread.Queue(nil, FlushLogQueue);
+  end;
+end;
+
+procedure TMyRichEdit.LogLine(const Msg: string; Line: Integer);
+begin
+  if (Line >= 0) and (Line < Lines.Count) then
+  begin
+    if TThread.CurrentThread.ThreadID = MainThreadID then
+      Lines.Strings[Line] := Msg
+    else
+      TThread.Queue(nil,
+        procedure
+        begin
+          Lines.Strings[Line] := Msg;
+        end);
   end
   else
     Log(Msg);
 end;
 
-procedure TMyRichEdit.LogEndLine(const Msg: String);
+procedure TMyRichEdit.LogEndLine(const Msg: string);
 begin
   if Lines.Count > 0 then
-  begin
-    FLock.Enter;
-    try
-      Lines.Strings[Lines.Count - 1] := Lines.Strings[Lines.Count - 1] + Msg;
-    finally
-      FLock.Leave;
-    end;
-  end
+    LogLine(Lines.Strings[Lines.Count - 1] + Msg, Lines.Count - 1)
   else
     Log(Msg);
 end;
@@ -641,24 +738,29 @@ end;
 procedure TMyRichEdit.LogBuffer(const Buffer: array of Byte; Count: Integer);
 var
   i: Integer;
-  str: String;
+  sb: TStringBuilder;
 begin
-  str := '';
-  for i := 0 to Count - 1 do
-  begin
-    str := str + Format('%.02x ', [Buffer[i]]);
-    if ((i + 1) mod 16) = 0 then
+  sb := TStringBuilder.Create;
+  try
+    for i := 0 to Count - 1 do
     begin
-      Log(str);
-      str := '';
+      sb.AppendFormat('%.02x ', [Buffer[i]]);
+      if ((i + 1) mod 16) = 0 then
+      begin
+        Log(sb.ToString);
+        sb.Clear;
+      end;
     end;
+    if sb.Length > 0 then
+      Log(sb.ToString);
+  finally
+    sb.Free;
   end;
-  if str <> '' then
-    Log(str);
 end;
 
 function TMyRichEdit.GetLastLine(): String;
 begin
+  FLock.Enter;
   try
     if Lines.Count > 0 then
       Result := Lines.Strings[Lines.Count - 1]
@@ -669,15 +771,14 @@ begin
   end;
 end;
 
-function TMyRichEdit.GetLine(Line: Integer): String;
+function TMyRichEdit.GetLine(Line: Integer): string;
 begin
-  Result := '';
   FLock.Enter;
   try
-    if (Line < 0) or (Line >= Lines.Count) then
-      Result := ''
+    if (Line >= 0) and (Line < Lines.Count) then
+      Result := Lines.Strings[Line]
     else
-      Result := Lines.Strings[Line];
+      Result := '';
   finally
     FLock.Leave;
   end;
@@ -687,12 +788,12 @@ function TMyRichEdit.IsModifiedByExternal(): Boolean;
 var
   CurrentTimestamp: TDateTime;
 begin
-  CurrentTimestamp := FileAge(Self.FPathFileName);
-  if CurrentTimestamp <> FPrevTimestamp then
-  begin
-    /// ShowMessage('The file has been modified externally.');
-    // Do something in response to the external modification
-  end;
+  if not FileExists(FPathFileName) then
+    Exit(false);
+  CurrentTimestamp := FileAge(FPathFileName);
+  Result := CurrentTimestamp <> FPrevTimestamp;
+  if Result then
+    FPrevTimestamp := CurrentTimestamp;
 end;
 
 procedure TMyRichEdit.SaveTo(const PathFileName: String);
@@ -735,16 +836,27 @@ begin
   Self.FPrevTimestamp := FileAge(PathFileName);
 end;
 
-procedure TMyRichEdit.LoadFrom(PathFileName: String);
+function TMyRichEdit.ExistLocalFile(): Boolean;
 begin
+  if FileExists(Self.FPathFileName) then
+    Result := true
+  else
+    Result := false;
+end;
+
+function TMyRichEdit.LoadFrom(PathFileName: String): Boolean;
+begin
+  Result := false;
   if FileExists(PathFileName) then
   begin
     Self.Lines.LoadFromFile(PathFileName);
     Self.FPathFileName := PathFileName;
+    Result := true;
   end
   else if FileExists(Self.FPathFileName) then
   begin
     Self.Lines.LoadFromFile(Self.FPathFileName);
+    Result := true;
   end
   else
   begin
@@ -851,7 +963,7 @@ begin
 end;
 
 // 取得文件编码
-function DetectTextFileEncoding(const FileName: string): TEncoding;
+function TMyRichEdit.DetectTextFileEncoding(const FileName: string): TEncoding;
 var
   Buffer: array [0 .. 3] of Byte;
   Stream: TFileStream;
@@ -938,14 +1050,17 @@ end;
 procedure TMyRichEdit.SetHexadecimalMode();
 var
   SourceEncoding: TEncoding;
-  /// i: Integer;
 begin
-  SourceEncoding := Self.Lines.Encoding;
-  // 将Memo控件中的文本内容转换为源编码格式的字节序列
-  FSourceBytes := SourceEncoding.GetBytes(Text);
-  Self.Clear;
-  LogBuffer(FSourceBytes, Length(FSourceBytes));
-  DataEngineManager.Remove2(FTAG);
+
+  try
+    SourceEncoding := Self.Lines.Encoding;
+    // 将Memo控件中的文本内容转换为源编码格式的字节序列
+    FSourceBytes := SourceEncoding.GetBytes(Text);
+    Self.Clear;
+    LogBuffer(FSourceBytes, Length(FSourceBytes));
+    DataEngineManager.Remove2(FTAG);
+  except
+  end;
 end;
 
 procedure TMyRichEdit.SetHexadecimalMode(HexMode: Boolean);
@@ -960,8 +1075,8 @@ begin
 
   if (not HexMode) then
   begin
-    LoadFrom('');
-    FHexadecimalMode := false;
+    if LoadFrom('') then
+      FHexadecimalMode := false;
   end;
 end;
 
@@ -1050,22 +1165,9 @@ begin
       NewRichEdit.ScrollBars := ssBoth;
       NewRichEdit.DoubleBuffered := true;
       NewRichEdit.FDoubleBuffered := true;
-      /// NewRichEdit.FDoubleBufferedSaved := true;
       NewRichEdit.ParentDoubleBuffered := true;
       NewRichEdit.SetDefaultFormat();
       FRichEditList.Add(NewRichEdit);
-
-      { NewRichEdit.LineNumbersPanel := TMyPanel.Create(NewTab);
-        NewRichEdit.LineNumbersPanel.Parent := NewTab;
-        NewRichEdit.LineNumbersPanel.Font := NewRichEdit.Font;
-        NewRichEdit.LineNumbersPanel.Align := alLeft;
-        NewRichEdit.LineNumbersPanel.BevelOuter := bvNone;
-        NewRichEdit.LineNumbersPanel.Caption := '';
-        NewRichEdit.LineNumbersPanel.Height := NewRichEdit.Height;
-        NewRichEdit.LineNumbersPanel.Width := 30;
-        NewRichEdit.LineNumbersPanel.DoubleBuffered := true;
-        NewRichEdit.LineNumbersPanel.SetParentDoubleBuffered(true);
-        NewRichEdit.LineNumbersPanel.y:= NewRichEdit.Top; }
     end;
   end
 
@@ -1248,6 +1350,7 @@ begin
     Result := GetComponent(TabSheet.PageIndex);
   end;
 end;
+
 { procedure TMyPageEdit.Log(Msg: String; Index: Integer);
   var
   NewRichEdit: TTextControl;

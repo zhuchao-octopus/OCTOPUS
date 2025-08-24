@@ -11,7 +11,7 @@ object PageSetupFrm: TPageSetupFrm
   Font.Height = -13
   Font.Name = 'Default'
   Font.Style = []
-  Position = poMainFormCenter
+  Position = poDesktopCenter
   OnShow = FormShow
   TextHeight = 17
   object PageControl1: TPageControl

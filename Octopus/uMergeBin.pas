@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Math, Vcl.StdCtrls, Vcl.Mask,
-  Vcl.ExtCtrls, StrUtils;
+  Vcl.ExtCtrls, StrUtils,
+  OcComPortObj, Vcl.ComCtrls;
 
 type
   // Metadata structure written to each APP segment's end
@@ -40,6 +41,8 @@ type
     Button7: TButton;
     ComboBox1: TComboBox;
     Button8: TButton;
+    Button9: TButton;
+    ProgressBar1: TProgressBar;
     procedure Button4Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -50,14 +53,16 @@ type
     procedure ComboBox1DropDown(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
   private
     { Private declarations }
     App1Info, App2Info: TFlashBankInfo;
     procedure MergeBinFiles(const BinAPath, BinBPath, OutputPath: string; OffsetB: Integer);
-
+    procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
     procedure updateComboBoxList();
   public
     { Public declarations }
+    OcComPortObj: TOcComPortObj;
   end;
 
 const
@@ -69,7 +74,9 @@ var
 
 implementation
 
-uses uCRC;
+uses Winapi.ShellAPI, System.UITypes, System.IOUtils, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj,
+  OcProtocol, uCRC;
+
 {$R *.dfm}
 
 function FNV1aHash32(const S: string): Cardinal;
@@ -291,6 +298,62 @@ begin
   LabeledEdit4.Text := '0x' + IntToHex(LoadAddress, 8);
 end;
 
+procedure TMergeBinFrm.Button9Click(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+  FileStream: TFileStream;
+  FileNameLoaded: String;
+begin
+  /// GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  if OcComPortObj = nil then
+  begin
+    OcComPortObj.Log('No device is found,please open a device.');
+    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    Exit;
+  end;
+
+  if not OcComPortObj.Connected then
+  begin
+    OcComPortObj.Log('No device is found,please open a device.');
+    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    Exit;
+  end;
+
+  FileNameLoaded := Trim(LabeledEdit3.Text); // OpenDialog1.FileName;
+  if FileExists(FileNameLoaded) then
+  begin
+    FileStream := ReadFileToStream(FileNameLoaded);
+    OcComPortObj.Log(' ');
+    OcComPortObj.Log('File Name: ' + FileNameLoaded);
+    OcComPortObj.Log('File Size: ' + IntToStr(FileStream.Size) + ' Bytes');
+    // OcComPortObj.Log('This file have been loaded,press the left-bottom button to start sending');
+    if (FileStream.Size > 1024 * 1024 * 5) then
+    begin
+      OcComPortObj.Log('This file size is too biger,only support less then 5M size file.');
+    end;
+    FileStream.Free;
+    FileStream := nil;
+  end
+  else
+  begin
+    OcComPortObj.Log('Do not exist the file ' + FileNameLoaded);
+    Exit;
+  end;
+
+  /// ComboBox301.ItemIndex := 0;
+  /// ComboBox2.ItemIndex := Ord(OctopusProtocol);
+  /// ComboBox2.OnChange(Self);
+  /// if IsBinFile(FileNameLoaded) then
+  /// begin
+  OcComPortObj.SendFormat := Ord(S_OctopusProtocol);
+  SendFileAsBin(OcComPortObj, FileNameLoaded);
+  /// end
+  /// else
+  /// begin
+  /// SendFileAsCommon(OcComPortObj);
+  /// end;
+end;
+
 procedure TMergeBinFrm.ComboBox1DropDown(Sender: TObject);
 begin
   updateComboBoxList();
@@ -476,6 +539,117 @@ begin
     FileA.Free;
     FileB.Free;
     FileOut.Free;
+  end;
+end;
+
+procedure TMergeBinFrm.SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
+const
+  BLOCK_SIZE = 48; // 每次发送的数据长度
+var
+  FS: TFileStream;
+  Frame: TOctopusUARTFrame;
+  DynamicData: array of Byte;
+  ReadAddress, BankAddress, MappingAdress: UInt32;
+  TotalLength: Integer;
+  TotalCRC: Cardinal;
+  Buffer: array [0 .. BLOCK_SIZE - 1] of Byte;
+  BytesRead: Integer;
+  SendCount: Integer;
+  StatusOK: Boolean;
+begin
+  if not FileExists(FileName) then
+  begin
+    ShowMessage('BIN file does not exist: ' + FileName);
+    Exit;
+  end;
+
+  if not OcComPortObj.Connected then
+  begin
+    ShowMessage('Device is not connected.');
+    Exit;
+  end;
+
+  FS := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
+  try
+    OcComPortObj.OctopusUartProtocol.ClearFrame;
+    TotalLength := FS.Size;
+    ReadAddress := 0;
+    BankAddress := 0;
+    SendCount := 0;
+    TotalCRC := $FFFFFFFF;
+    if TotalLength < 8 then
+      Exit;
+
+    FS.Position := 4;
+    FS.ReadBuffer(BankAddress, 4);
+    BankAddress := BankAddress and $FFFF0000;
+    MappingAdress := BankAddress;
+    // 发送启动升级帧：首地址为 0，总长度为文件大小
+    SetLength(DynamicData, 8);
+    Move(BankAddress, DynamicData[0], 4);
+    Move(TotalLength, DynamicData[4], 4);
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_ENTER_FW_UPGRADE_MODE, DynamicData, 8);
+    StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(FRAME_CMD_UPDATE_REQUEST_FW_DATA));
+    if not StatusOK then
+    begin
+      OcComPortObj.Log('Device is not ready to receive bin file.');
+      FS.Free;
+      Exit;
+    end;
+
+    FS.Position := 0;
+    ReadAddress := 0;
+    while FS.Position < FS.Size do
+    begin
+      BytesRead := FS.Read(Buffer, BLOCK_SIZE);
+      if BytesRead <= 0 then
+        break;
+
+      Inc(SendCount);
+
+      SetLength(DynamicData, 4 + BytesRead);
+      MappingAdress := BankAddress + ReadAddress;
+      Move(MappingAdress, DynamicData[0], 4); // 前4字节是地址
+      Move(Buffer, DynamicData[4], BytesRead); // 后续为数据
+
+      Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_SEND_FW_DATA, DynamicData, Length(DynamicData));
+
+      StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(FRAME_CMD_UPDATE_REQUEST_FW_DATA), Ord(MCU_UPDATE_STATE_RECEIVING), SendCount);
+      if not StatusOK then
+      begin
+        OcComPortObj.Log('Transmission failed at offset: ' + IntToStr(ReadAddress));
+        FS.Free;
+        Exit;
+      end;
+
+      TotalCRC := UpdateCRC32(DynamicData, 4, BytesRead, TotalCRC); // 从地址后数据部分开始计算
+      Inc(ReadAddress, BytesRead);
+      // StatusBar1DrawProgress(ReadAddress, TotalLength);
+      ProgressBar1.Max := TotalLength;
+      ProgressBar1.Position := ReadAddress;
+      Application.ProcessMessages;
+    end;
+
+    // 最后一帧：发送退出+CRC+总长度
+    TotalCRC := TotalCRC xor $FFFFFFFF;
+    SetLength(DynamicData, 8);
+    Move(TotalCRC, DynamicData[0], 4);
+    Move(TotalLength, DynamicData[4], 4);
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_EXITS_FW_UPGRADE_MODE, DynamicData, 8);
+    StatusOK := OcComPortObj.SendProtocolPackage(@Frame);
+
+    if StatusOK then
+    begin
+      OcComPortObj.Log('BIN file sent successfully. CRC=' + IntToHex(TotalCRC, 8));
+    end
+    else
+    begin
+      OcComPortObj.Log('BIN file send failed at finalization step.');
+    end;
+
+  finally
+    if FS <> nil then
+      FS.Free;
   end;
 end;
 

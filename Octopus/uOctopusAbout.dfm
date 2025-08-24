@@ -11,7 +11,7 @@ object AboutBox: TAboutBox
   Font.Height = -13
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poScreenCenter
+  Position = poDesktopCenter
   OnCreate = FormCreate
   TextHeight = 17
   object OKButton: TButton

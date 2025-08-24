@@ -3,15 +3,15 @@ object MergeBinFrm: TMergeBinFrm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Merge Bin File'
-  ClientHeight = 574
-  ClientWidth = 941
+  ClientHeight = 653
+  ClientWidth = 943
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
   Font.Name = 'Default'
   Font.Style = []
-  Position = poMainFormCenter
+  Position = poDesktopCenter
   OnShow = FormShow
   TextHeight = 17
   object LabeledEdit1: TLabeledEdit
@@ -40,7 +40,7 @@ object MergeBinFrm: TMergeBinFrm
     Left = 848
     Top = 31
     Width = 75
-    Height = 25
+    Height = 30
     Caption = '...'
     TabOrder = 2
     OnClick = Button1Click
@@ -49,7 +49,7 @@ object MergeBinFrm: TMergeBinFrm
     Left = 848
     Top = 77
     Width = 75
-    Height = 25
+    Height = 30
     Caption = '...'
     TabOrder = 3
     OnClick = Button2Click
@@ -57,9 +57,9 @@ object MergeBinFrm: TMergeBinFrm
   object Button3: TButton
     Left = 8
     Top = 224
-    Width = 313
-    Height = 25
-    Caption = 'Start Merging BIN Files'
+    Width = 617
+    Height = 30
+    Caption = 'Start Merging The Bin Files'
     TabOrder = 4
     OnClick = Button3Click
   end
@@ -78,7 +78,7 @@ object MergeBinFrm: TMergeBinFrm
     Left = 848
     Top = 127
     Width = 75
-    Height = 25
+    Height = 30
     Caption = '...'
     TabOrder = 6
     OnClick = Button4Click
@@ -86,7 +86,7 @@ object MergeBinFrm: TMergeBinFrm
   object LabeledEdit4: TLabeledEdit
     Left = 13
     Top = 176
-    Width = 308
+    Width = 324
     Height = 25
     EditLabel.Width = 67
     EditLabel.Height = 17
@@ -110,27 +110,27 @@ object MergeBinFrm: TMergeBinFrm
   end
   object Button5: TButton
     Left = 848
-    Top = 464
+    Top = 523
     Width = 75
-    Height = 25
+    Height = 30
     Caption = 'Exit'
     TabOrder = 9
     OnClick = Button5Click
   end
   object Button6: TButton
     Left = 848
-    Top = 432
+    Top = 472
     Width = 75
-    Height = 25
+    Height = 30
     Caption = 'Clear'
     TabOrder = 10
     OnClick = Button6Click
   end
   object Button7: TButton
-    Left = 432
+    Left = 648
     Top = 224
-    Width = 390
-    Height = 25
+    Width = 174
+    Height = 30
     Caption = 'Read The Meta Infor'
     TabOrder = 11
     OnClick = Button7Click
@@ -145,20 +145,37 @@ object MergeBinFrm: TMergeBinFrm
     OnDropDown = ComboBox1DropDown
   end
   object Button8: TButton
-    Left = 327
-    Top = 176
+    Left = 343
+    Top = 174
     Width = 75
-    Height = 25
+    Height = 30
     Caption = 'Update'
     TabOrder = 13
     OnClick = Button8Click
   end
+  object Button9: TButton
+    Left = 8
+    Top = 610
+    Width = 910
+    Height = 30
+    Caption = 'Start Upgrading'
+    TabOrder = 14
+    OnClick = Button9Click
+  end
+  object ProgressBar1: TProgressBar
+    Left = 8
+    Top = 565
+    Width = 910
+    Height = 30
+    Step = 1
+    TabOrder = 15
+  end
   object SaveDialog1: TSaveDialog
-    Left = 864
-    Top = 200
+    Left = 280
+    Top = 16
   end
   object OpenDialog1: TOpenDialog
-    Left = 864
-    Top = 256
+    Left = 272
+    Top = 80
   end
 end

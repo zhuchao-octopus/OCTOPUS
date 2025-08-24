@@ -7,6 +7,7 @@ uses
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.ClipBrd,
   Vcl.ToolWin, Vcl.ActnList, System.Actions, System.ImageList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
   Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes,
+
   System.SyncObjs,
   IniFiles,
   OcComPortObj,
@@ -473,9 +474,9 @@ var
 
 implementation
 
-uses uOctopusAbout, RichEdit, Winapi.ShellAPI, System.UITypes, System.IOUtils, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj,
-  uSetting, math, OcProtocol, CPort, uMainSetting, uSMTP, uEncryptionDecryption, uCRC,
-  Screenshot, uScreenMain, uCommand, uDownloader, uDownloadsManager, uPageSetup,
+uses System.UITypes, System.IOUtils, System.Math, System.Win.ComObj, Winapi.RichEdit, Winapi.ShellAPI, Winapi.ShlObj, Winapi.ActiveX,
+  uSetting, OcProtocol, CPort, uMainSetting, uSMTP, uEncryptionDecryption, uCRC,
+  Screenshot, uScreenMain, uCommand, uDownloader, uDownloadsManager, uPageSetup, uOctopusAbout,
   uMergeBin;
 
 resourcestring
@@ -857,18 +858,46 @@ begin
   end;
 end;
 
+procedure SetSelColor(RE: TRichEdit; AColor: TColor);
+var
+  cf: CHARFORMAT2;
+begin
+  FillChar(cf, SizeOf(cf), 0);
+  cf.cbSize := SizeOf(cf);
+  cf.dwMask := CFM_COLOR;
+  cf.crTextColor := ColorToRGB(AColor);
+  SendMessage(RE.Handle, EM_SETCHARFORMAT, SCF_SELECTION, LPARAM(@cf));
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.FGColorBoxChange(Sender: TObject);
 var
   Component: TComponent;
 begin
   Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+
   if Component is TMemo then
   begin
     TMemo(Component).Font.Color := FGColorBox.Selected;
   end;
   if Component is TMyRichEdit then
   begin
-    TMyRichEdit(Component).SelAttributes.Color := FGColorBox.Selected;
+    CMyRichEdit := TMyRichEdit(Component);
+    if CMyRichEdit.SelLength > 0 then
+    begin
+      if TThread.CurrentThread.ThreadID = MainThreadID then
+      begin
+        CMyRichEdit.PlainText := false;
+        CMyRichEdit.ParentFont := false;
+        CMyRichEdit.SelAttributes.Color := FGColorBox.Selected;
+        // CMyRichEdit.Font.Color:=  FGColorBox.Selected;
+        // CMyRichEdit.Repaint;
+        // SetSelColor(CMyRichEdit,FGColorBox.Selected);
+      end;
+    end
+    else
+    begin
+      // ShowMessage('请先选择一段文本');
+    end;
   end;
 end;
 
@@ -1023,6 +1052,7 @@ begin
     CMyRichEdit := TMyRichEdit(Component);
     SynchroSetMyRichEditFont(Component);
     SetPathFileName(CMyRichEdit.FPathFileName);
+    Self.ComBoBoxFontName.ItemIndex := Self.ComBoBoxFontName.Items.IndexOf(CMyRichEdit.Font.Name);
   end;
   if Component is TMyMemo then
   begin
@@ -1071,7 +1101,7 @@ begin
   CMyRichEdit := PageControl1.GetEdit(sUntitled);
   if CMyRichEdit = nil then
     exit;
-
+  CMyRichEdit.StyleElements := [seClient, seBorder];
   LoadUntitledContent(CMyRichEdit);
 
   /// SetPathFileName(sUntitled);
@@ -1523,6 +1553,7 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.MergeBinFile1Click(Sender: TObject);
 begin
+  MergeBinFrm.OcComPortObj := Self.GetCurrentSelectedDevice();
   MergeBinFrm.ShowModal();
 end;
 
@@ -1533,7 +1564,7 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ScreenshotTool1Click(Sender: TObject);
 begin
-  //WindowState := wsMinimized;
+  // WindowState := wsMinimized;
   Self.Hide;
   sleep(300);
   if ScreenshotFrm = nil then
@@ -2176,10 +2207,17 @@ procedure TMainOctopusDebuggingDevelopmentForm.HexModeItemClick(Sender: TObject)
 var
   Component: TComponent;
 begin
-  Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  // CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if Component is TMyRichEdit then
   begin
+    CMyRichEdit := TMyRichEdit(Component);
     HexModeItem.Checked := not HexModeItem.Checked;
+    if not CMyRichEdit.ExistLocalFile() then
+    begin
+      SaveLog(Component, sUntitled);
+      SetPathFileName(FileSaveAsCmd.Dialog.FileName);
+    end;
     CMyRichEdit.SetHexadecimalMode(HexModeItem.Checked);
   end;
 end;
@@ -3174,43 +3212,59 @@ var
   PageIndex: Integer;
   Component: TComponent;
 begin
+  // 创建新页面并获取索引
   PageControl1.CreatePage(PageName, PageType);
   PageIndex := PageControl1.GetPageIndex(PageName);
   Component := PageControl1.GetComponent(PageIndex);
   PageControl1.ActivePageIndex := PageIndex;
 
+  // 如果页面组件是 RichEdit，则进行初始化
   if Component is TMyRichEdit then
   begin
     MyRichEdit := TMyRichEdit(Component);
-    if MyRichEdit <> nil then
-    begin
-      MyRichEdit.OnSelectionChange := Self.SelectionChange;
-      MyRichEdit.OnClick := Self.RichEditorClick;
-      MyRichEdit.OnLinkClick := Self.RichEditorLinkClick;
-      MyRichEdit.PopupMenu := Self.PopupMenu1;
-      MyRichEdit.PlainText := false;
-      MyRichEdit.ParentFont := false;
-      MyRichEdit.SpellChecking := true;
-      /// 这个属性只在Memo、RichEdit和DBMemo组件中使用。通常在切换当前焦点控件时，我们通常使用Tab键。
-      /// 但在上述三种组件中，编辑文本时常用Tab键来跳过若干个空格使文本对齐，这时就会有冲突。
-      /// 所以应将WantTabs设置为True，这样子在组件内就可以使用Tab键来编辑文本。
-      MyRichEdit.WantTabs := true;
-      /// 需要回车键，否则无法回车换行
-      MyRichEdit.WantReturns := true;
-      /// 用于设定Momo组件是否具有自动折行功能。
-      MyRichEdit.WordWrap := false;
-      MyRichEdit.OnChange := nil;
-    end;
+    // 事件绑定
+    MyRichEdit.OnSelectionChange := Self.SelectionChange;
+    MyRichEdit.OnClick := Self.RichEditorClick;
+    MyRichEdit.OnLinkClick := Self.RichEditorLinkClick;
+
+    // 上下文菜单
+    MyRichEdit.PopupMenu := Self.PopupMenu1;
+
+    // 编辑器配置
+    MyRichEdit.PlainText := false; // 支持 RTF 格式
+    MyRichEdit.ParentFont := false; // 独立字体，不继承父控件
+    MyRichEdit.SpellChecking := true; // 启用拼写检查
+
+    // 键盘输入配置
+    // 这个属性只在Memo、RichEdit和DBMemo组件中使用。
+    // 通常在切换当前焦点控件时，我们通常使用Tab键。
+    // 但在上述三种组件中，编辑文本时常用Tab键来跳过若干个空格使文本对齐，这时就会有冲突。
+    // 所以应将WantTabs设置为True，这样子在组件内就可以使用Tab键来编辑文本。
+    MyRichEdit.WantTabs := true; // Tab 键输入制表符，而非切换焦点
+    MyRichEdit.WantReturns := true; // 回车换行
+
+    // 文字显示
+    MyRichEdit.WordWrap := false; // 禁用自动换行，允许水平滚动
+    MyRichEdit.OnChange := nil; // 初始时不绑定 OnChange 事件
+
+    // StyleElements := [seClient, seBorder]; → 禁用字体样式，保留客户端和边框样式
+    // StyleElements := []; → 禁用该控件的全部 VCL 样式（纯系统外观）
+    // StyleElements := StyleElements - [seBorder]; → 关闭边框的样式，其他照旧
+    MyRichEdit.StyleElements := [seClient, seBorder];
+    Self.ComBoBoxFontName.ItemIndex := Self.ComBoBoxFontName.Items.IndexOf(MyRichEdit.Font.Name);
   end;
 
+  // 如果是 WebBrowser 页，且 WebBrowser 尚未创建，则获取并缓存
   if (PageType = 1) and (WebBrowser = nil) then
   begin
     WebBrowser := PageControl1.GetWebBrowser(PageName);
   end;
 
+  // 如果页面是 Memo 类型，预留事件绑定位置
   if Component is TMyMemo then
   begin
-    /// TMyMemo(Component).OnClick := Self.RichEditorClick;
+    // TMyMemo(Component).OnClick := Self.RichEditorClick;
+    Self.ComBoBoxFontName.ItemIndex := Self.ComBoBoxFontName.Items.IndexOf(TMyMemo(Component).Font.Name);
   end;
 end;
 
@@ -3433,6 +3487,11 @@ begin
       Octopusini.WriteBool('Configuration', 'APPLICATION_MENU_ITEM_EXPLORER', SettingPagesDlg.CheckBoxShortcutForExplorer.Checked);
       Octopusini.WriteBool('Configuration', 'APPLICATION_MENU_ITEM_DESKTOP', SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked);
       /// Octopusini.WriteString('Configuration', 'APPLICATION_VERSIONNUMBER64', FVersionNumberStr);
+
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_CUSTOM_WIDTH', Self.Width);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_CUSTOM_HEIGHT', Self.Height);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_CUSTOM_TOP', Self.Top);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_CUSTOM_LEFT', Self.Left);
     end;
   finally
     Octopusini.Free;
@@ -3444,7 +3503,7 @@ var
   Octopusini: TIniFile;
   s: string;
   i: Integer;
-  /// ThemeSkinName: String;
+  w, h, t, l: Integer;
   b: Boolean;
 begin
   Octopusini := nil;
@@ -3460,6 +3519,25 @@ begin
       StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_2', '');
       /// StringGrid1.Cells[6, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_6', '');
     end;
+
+    w := Octopusini.ReadInteger('MyPreference', 'APPLICATION_CUSTOM_WIDTH', Self.Width);
+    h := Octopusini.ReadInteger('MyPreference', 'APPLICATION_CUSTOM_HEIGHT', Self.Height);
+    t := Octopusini.ReadInteger('MyPreference', 'APPLICATION_CUSTOM_TOP', Self.Top);
+    l := Octopusini.ReadInteger('MyPreference', 'APPLICATION_CUSTOM_LEFT', Self.Left);
+    if w < 100 then
+      w := 100;
+    if h < 200 then
+      h := 200;
+
+    if t < 0 then
+      t := 10;
+    if l < 0 then
+      l := 10;
+
+    Self.Width := w;
+    Self.Height := h;
+    Self.Top := t;
+    Self.Left := l;
 
     b := Octopusini.ReadBool('MyPreference', 'APPLICATION_CHINESE_LANG', false);
 

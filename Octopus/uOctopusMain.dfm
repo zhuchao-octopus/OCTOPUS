@@ -12,7 +12,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
   Font.Name = 'Default'
   Font.Style = []
   Menu = MainMenu
-  Position = poDefaultSizeOnly
+  Position = poDesigned
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnResize = FormResize
@@ -2157,19 +2157,19 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         OnClick = ScreenshotTool1Click
       end
       object ScreenshotTool2: TMenuItem
-        Caption = 'Screenshot Tool'
+        Caption = 'Screenshot Tool ...'
         OnClick = ScreenshotTool2Click
       end
       object DataEncryption1: TMenuItem
-        Caption = 'Data Encryption'
+        Caption = 'Data Encryption ...'
         OnClick = DataEncryption1Click
       end
       object CRC1: TMenuItem
-        Caption = 'CRC Tool'
+        Caption = 'CRC Tool ...'
         OnClick = CRC1Click
       end
       object MergeBinFile1: TMenuItem
-        Caption = 'Merge Bin File'
+        Caption = 'Merge Bin File ...'
         OnClick = MergeBinFile1Click
       end
       object MachineLearningOfNeuralNetworks1: TMenuItem

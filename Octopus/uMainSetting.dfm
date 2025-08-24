@@ -12,7 +12,7 @@ object SettingPagesDlg: TSettingPagesDlg
   Font.Height = -13
   Font.Name = 'Default'
   Font.Style = []
-  Position = poMainFormCenter
+  Position = poDesktopCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
