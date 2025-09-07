@@ -56,7 +56,7 @@ procedure ExecuteExternalProgram(const FileName: string);
 
 implementation
 
-uses Json, REST.Json, ShellAPI, uOctopusFunction;
+uses Json, REST.Json, ShellAPI, uOctopusFunction,uUsartSetting;
 
 {$R *.dfm}
 

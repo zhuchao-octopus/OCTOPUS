@@ -1,4 +1,4 @@
-unit uMainSetting;
+unit uUsartSetting;
 
 interface
 
@@ -6,10 +6,15 @@ uses
   Winapi.Windows,
   Winapi.Messages,
   Winapi.ShellAPI,
+  Winapi.ShlObj,
+  Winapi.ActiveX,
+
   System.SysUtils,
   System.Classes,
   System.ImageList,
   System.Math,
+  System.Win.ComObj,
+
   Vcl.Graphics,
   Vcl.Forms,
   Vcl.Dialogs,
@@ -24,9 +29,11 @@ uses
   Vcl.Menus,
   Vcl.Grids,
   Vcl.Mask,
+
   Registry,
+
   GlobalFunctions,
-  OcComPortObj;
+  uOcComPortObj;
 
 type
   TSettingChangedCallBackFuntion = Procedure(Obj: TObject; Action: integer) of object;
@@ -176,20 +183,42 @@ type
 var
   SettingPagesDlg: TSettingPagesDlg;
 
-
-
 function ExtractFileNameNoExt(FilePathName: String): String;
 function GetSystemDateTimeStampStr(): string;
 function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: integer = -1): Boolean;
-procedure AddExplorerContextMenu(const MenuName, PathFileName, FileType: string);
+procedure AddExplorerContextMenu(const MenuName, PathFileName: string);
 procedure RemoveExplorerContextMenu(const MenuName: string);
+
+const
+{$IFDEF CPU64BITS}
+  APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
+{$ELSE}
+  APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
+{$ENDIF}
+  OCTOPUS_DEFAULT_E_MAIL = 'Octopus@1234998.cn';
+  OCTOPUS_DEFAULT_CONFIGURATION_DIR = '\Setting\';
+  OCTOPUS_DEFAULT_LOG_DIR = '\Logs\';
+
+  OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 = 'http://www.1234998.cn';
+  OCTOPUS_DEFAULT_WEBSITE_ADDRESS2 = 'http://www.1234998.top';
+
+  OCTOPUS_UPGRADING_URL = 'http://47.106.172.94:8090/zhuchao/octopus/devices/getDeviceInfor';
+  OCTOPUS_APPLICATION_TITLE_NAME = 'Octopus Usart Debugging and Development Assistant';
+  OCTOPUS_DEBUGGING_AND_DEVELOPMENT_CLASSNAME = 'TMainOctopusDebuggingDevelopmentForm';
+
+{$IFDEF CPU64BITS}
+  OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME = 'Octopus Usart Developer Assistant'; // for 64 bit;
+  OCTOPUS_SYSTEM_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
+{$ELSE}
+  OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME = 'Octopus Usart Development Assistant 32'; // for 32 bit;
+  OCTOPUS_SYSTEM_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
+{$ENDIF}
 
 implementation
 
 {$R *.dfm}
 
-uses ocPcDeviceMgt, IniFiles, uOctopusFunction, CPort, CPortCtl, uDeviceMaintence, Winapi.ShlObj, Winapi.ActiveX,
-  System.Win.ComObj;
+uses ocPcDeviceMgt, IniFiles, uOctopusFunction, CPort, CPortCtl, uDeviceMaintence;
 
 function GetSystemDateTimeStampStr(): string;
 var
@@ -528,7 +557,7 @@ begin
 
   if CheckBoxShortcutForExplorer.Checked then
   begin
-    AddExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME, Application.Exename, '*');
+    AddExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME, Application.Exename);
   end;
   if CheckBoxDesktopShortcutMenu.Checked then
   begin
@@ -550,15 +579,16 @@ end;
 
 procedure TSettingPagesDlg.FormShow(Sender: TObject);
 var
-  //OcComPortObj: TOcComPortObj;
-  i:integer;
+  // OcComPortObj: TOcComPortObj;
+  i: integer;
 begin
-  //OcComPortObj := getDeciceByFullName(getCurrentDeviceName());
-  if SelectedOcComPortObj = nil then  exit;
+  // OcComPortObj := getDeciceByFullName(getCurrentDeviceName());
+  if SelectedOcComPortObj = nil then
+    exit;
 
   i := ComboBoxEx1.Items.IndexOf(SelectedOcComPortObj.ComPortFullName);
   if (i >= 0) and (i < ComboBoxEx1.Items.Count) then
-      ComboBoxEx1.ItemIndex := i;
+    ComboBoxEx1.ItemIndex := i;
 
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
   UpdateLaunguage(self);
@@ -696,7 +726,7 @@ begin
   AlphaBlend := CheckBox7.Checked;
 
   if CheckBoxShortcutForExplorer.Checked then
-    AddExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME, Application.Exename, '*')
+    AddExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME, Application.Exename)
   else
     RemoveExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME);
 
@@ -1362,28 +1392,33 @@ begin
     Result := true;
 end;
 
-procedure AddExplorerContextMenu(const MenuName, PathFileName, FileType: string);
+procedure AddExplorerContextMenu(const MenuName, PathFileName: string);
 var
-  /// Reg: TRegistry;
-  fileName: String;
-  icon: String;
+  Reg: TRegistry;
+const
+  KeyName = 'OctopusSoftware'; // 固定 Key 名称
 begin
-  /// HKEY_LOCAL_MACHINE\Software\Classes
-  fileName := 'OctopusSoftware'; // ExtractFileNameNoExt(PathFileName);
-  icon := ExtractFilePath(PathFileName) + 'DefaultIcon.ico';
-  with TRegistry.Create do
-    try
-      RootKey := HKEY_CURRENT_USER;
-      if OpenKey('\Software\Classes\*\shell\' + fileName, true) then
-        WriteString('', MenuName);
-      if OpenKey('\Software\Classes\*\shell\' + fileName + '\command', true) then
-        WriteString('', PathFileName + ' "%1"');
+  //fileName := ChangeFileExt(ExtractFileName(PathFileName), '');
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
 
-      if OpenKey('\Software\Classes\*\shell\' + fileName + '\DefaultIcon', true) then
-        WriteString('', icon);
-    finally
-      Free;
-    end;
+    // 主菜单项
+    if Reg.OpenKey('\Software\Classes\*\shell\' + KeyName, true) then
+      Reg.WriteString('', MenuName);
+
+    // 命令
+    if Reg.OpenKey('\Software\Classes\*\shell\' + KeyName + '\command', true) then
+      Reg.WriteString('', '"' + PathFileName + '" "%1"');
+
+    // 图标
+    if Reg.OpenKey('\Software\Classes\*\shell\' + KeyName, true) then
+      Reg.WriteString('Icon', '"' + PathFileName + '",0');
+  finally
+    Reg.Free;
+  end;
+
+  // 通知系统刷新
   SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
 end;
 

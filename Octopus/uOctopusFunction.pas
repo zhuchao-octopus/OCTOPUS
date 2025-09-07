@@ -3,63 +3,11 @@ unit uOctopusFunction;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,System.Math,
   System.Classes, Vcl.Graphics, Vcl.Buttons,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.ImageList, Vcl.ImgList,
   Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.ValEdit, Vcl.Tabs,
   Vcl.WinXCtrls, Vcl.Menus, IniFiles, Vcl.Themes;
-
-Const
-
-{$IFDEF CPU64BITS}
-  APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
-{$ELSE}
-  APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
-{$ENDIF}
-  OCTOPUS_DEFAULT_E_MAIL = 'Octopus@1234998.cn';
-  OCTOPUS_DEFAULT_CONFIGURATION_DIR = '\Setting\';
-  OCTOPUS_DEFAULT_LOG_DIR = '\Logs\';
-
-  OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 = 'http://www.1234998.cn';
-  OCTOPUS_DEFAULT_WEBSITE_ADDRESS2 = 'http://www.1234998.top';
-
-  OCTOPUS_UPGRADING_URL = 'http://47.106.172.94:8090/zhuchao/octopus/devices/getDeviceInfor';
-  OCTOPUS_APPLICATION_TITLE_NAME = 'Octopus Serial Port Development & Debugging Assistant';
-  OCTOPUS_DEBUGGING_AND_DEVELOPMENT_CLASSNAME = 'TMainOctopusDebuggingDevelopmentForm';
-
-{$IFDEF CPU64BITS}
-  OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME = 'Octopus Serial Development Assistant'; // for 64 bit;
-  OCTOPUS_SYSTEM_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
-{$ELSE}
-  OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME = 'Octopus Serial Development Assistant 32'; // for 32 bit;
-  OCTOPUS_SYSTEM_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
-{$ENDIF}
-  /// DEFAULT_ADDRESSMAP_COLS = 32;
-  /// DEFAULT_FIXED_COLS = 2;
-  /// DEFAULT_MAX_CHART_POINTS = 30;
-
-  { OCCOMPROTOCAL_START = 10; // 连接，要求对方回复 状态是否可以连接
-    OCCOMPROTOCAL_ACK = 11; // 一般相应，要求对方相应当前状态
-    OCCOMPROTOCAL_READY = 12; // 准备就绪标记
-    OCCOMPROTOCAL_OVER = 13; // 任务结束标记
-    OCCOMPROTOCAL_GOT = $0E00; // 14; //数据包确认标记收到标记 ,复合在高字节
-
-    OCCOMPROTOCAL_I2C_READ = 50;
-    OCCOMPROTOCAL_I2C_WRITE = 51;
-    OCCOMPROTOCAL_SPI_READ = 52;
-    OCCOMPROTOCAL_SPI_WRITE = 53;
-    OCCOMPROTOCAL_WIFI_READ = 54;
-    OCCOMPROTOCAL_WIFI_WRITE = 55;
-    OCCOMPROTOCAL_UART_READ = 56;
-    OCCOMPROTOCAL_UART_WRITE = 57;
-
-    OCCOMPROTOCAL_DATA1 = $FC; // 标准协议数据 最大负载是512字节
-    OCCOMPROTOCAL_DATA2 = $FD; // 非标准协议表示数据是连续的，没有分包，或者说只有一个包
-
-    OCCOMPROTOCAL_ERROR = $FFFF;
-    OCCOMPROTOCAL_NONE = $0000;
-    OCCOMPROTOCAL_PACK_PACKPAYLOAD_HIGHT = 511;
-    OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT = 1023; }
 
 type
   TOnClicEvent = procedure(Sender: TObject) of object;
@@ -186,8 +134,37 @@ function DetectTextFileEncoding(const FileName: string): TEncoding;
 function CompareVersion(LVersion, RVersion: String): Boolean;
 function RemoveQuotes(const str: string): string;
 function NormalizeLineBreaks(const s: string): string;
+function IsBinaryFile(const FileName: string; MaxCheckSize: Integer = 4096): Boolean;
 
 implementation
+
+function IsBinaryFile(const FileName: string; MaxCheckSize: Integer = 4096): Boolean;
+var
+  FS: TFileStream;
+  buffer: TBytes;
+  i, ReadSize: Integer;
+begin
+  Result := False;
+  FS := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
+  try
+    ReadSize := Min(FS.Size, MaxCheckSize);
+    SetLength(buffer, ReadSize);
+    FS.ReadBuffer(buffer[0], ReadSize);
+
+    for i := 0 to ReadSize - 1 do
+    begin
+      if buffer[i] = 0 then
+        Exit(True); // 有 NULL 字节，判定为二进制
+      if not(buffer[i] in [9, 10, 13, 32 .. 126]) then
+      begin
+        // 允许常见可打印字符，其他视为二进制
+        Exit(True);
+      end;
+    end;
+  finally
+    FS.Free;
+  end;
+end;
 
 function NormalizeLineBreaks(const s: string): string;
 var
@@ -218,7 +195,7 @@ var
   Liv, Riv: Integer;
   Lsv, Rsv: String;
 begin
-  Result := false;
+  Result := False;
   Lsv := StringReplace(LVersion, '.', '', [rfReplaceAll, rfIgnoreCase]);
   Lsv := StringReplace(Lsv, '"', '', [rfReplaceAll, rfIgnoreCase]);
 
@@ -231,7 +208,7 @@ begin
   Except
   end;
   if Riv > Liv then
-    Result := true;
+    Result := True;
 end;
 
 function readFileToStream(FileName: String): TFileStream;
@@ -356,7 +333,7 @@ function checkIsHexStr(sStr: String): Boolean;
 var
   i: Integer;
 begin
-  Result := true;
+  Result := True;
   sStr := UpperCase(Trim(sStr));
   sStr := StringReplace(sStr, '0X', ' ', [rfReplaceAll]); // 替换0X
   sStr := StringReplace(sStr, ',', ' ', [rfReplaceAll]); // 替换 ,号
@@ -368,7 +345,7 @@ begin
   begin
     if not(sStr[i] in ['0' .. '9', 'A', 'B', 'C', 'D', 'E', 'F']) then
     begin
-      Result := false;
+      Result := False;
       break;
     end;
   end;
@@ -622,7 +599,7 @@ var
   hs1, hs2: String;
 begin
   hs1 := s;
-  while (true) do
+  while (True) do
   begin
     hs2 := StringReplace(hs1, '  ', ' ', [rfReplaceAll]); // 删除'  '
     if hs1 = hs2 then
@@ -719,7 +696,7 @@ var
   Menu: HMENU;
 
 begin
-  Menu := GetSysteMmenu(handle, false);
+  Menu := GetSysteMmenu(handle, False);
   if (SystemMainMenu = nil) then
     SystemMainMenu := TMainMenu.Create(nil);
   SystemMainMenu.Items.Clear;
@@ -734,16 +711,16 @@ begin
   end;
   AppendMenu(Menu, MF_SEPARATOR, 1023, 0);
   SystemMainMenu.Items.Caption := 'Theme';
-  AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, SystemMainMenu.handle, PChar(SystemMainMenu.Items.Caption));
+  AppendMenu(GetSysteMmenu(handle, False), MF_POPUP, SystemMainMenu.handle, PChar(SystemMainMenu.Items.Caption));
   // for i := Low(TStyleManager.StyleNames) to High(TStyleManager.StyleNames) do
   // AppendMenu(Menu,MF_POPUP,100+i,pchar(TStyleManager.StyleNames[i]));
-  AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1024, nil);
-  AppendMenu(GetSysteMmenu(handle, false), MF_UNCHECKED, 1025, PChar('Keep At The Top Always '));
+  AppendMenu(GetSysteMmenu(handle, False), MF_SEPARATOR, 1024, nil);
+  AppendMenu(GetSysteMmenu(handle, False), MF_UNCHECKED, 1025, PChar('Keep At The Top Always '));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1026, pchar(VERSIONNAME));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1027, pchar('English'));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028,  pchar('Chinese'));
-  AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1027, nil);
-  AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028, PChar('Help Support'));
+  AppendMenu(GetSysteMmenu(handle, False), MF_SEPARATOR, 1027, nil);
+  AppendMenu(GetSysteMmenu(handle, False), MF_POPUP, 1028, PChar('Help Support'));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1029, pchar(WEB_SITE));
 end;
 
@@ -773,13 +750,13 @@ begin
     tmpComponent := Form.Components[i];
     if tmpComponent is TPanel then
     begin
-      TPanel(tmpComponent).ParentColor := true;
-      TPanel(tmpComponent).ParentBackground := false;
+      TPanel(tmpComponent).ParentColor := True;
+      TPanel(tmpComponent).ParentBackground := False;
     end;
     if tmpComponent is TGroupBox then
     begin
-      TGroupBox(tmpComponent).ParentColor := true;
-      TGroupBox(tmpComponent).ParentBackground := false;
+      TGroupBox(tmpComponent).ParentColor := True;
+      TGroupBox(tmpComponent).ParentBackground := False;
     end;
 
   End;

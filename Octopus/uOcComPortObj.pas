@@ -1,22 +1,25 @@
-unit OcComPortObj;
+unit uOcComPortObj;
 
 interface
 
 uses
-  Vcl.StdCtrls,
-  Vcl.forms,
-  Vcl.Controls,
-  Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Variants,
   System.Classes,
   System.ImageList,
   System.Actions,
-  CPort,
-  OcProtocol,
+  Winapi.Windows,
+  Winapi.Messages,
+
+  Vcl.StdCtrls,
+  Vcl.forms,
+  Vcl.Controls,
   VCLTee.Series,
   Vcl.MyPageEdit,
+
+  CPort,
+  uOcProtocol,
+
   RegularExpressions,
   System.SyncObjs;
 
@@ -2411,7 +2414,6 @@ begin
   except
     log('Can not close  ' + FComPortFullName);
   end;
-
 end;
 
 procedure TOcComPortObj.Free();

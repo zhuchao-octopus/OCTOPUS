@@ -3,10 +3,12 @@ unit uMergeBin;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Math, Vcl.StdCtrls, Vcl.Mask,
+  System.UITypes, System.IOUtils, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj, System.SysUtils, System.Variants, System.Classes,
+  Winapi.Windows, Winapi.Messages, Winapi.ShellAPI,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Math, Vcl.StdCtrls, Vcl.Mask,
   Vcl.ExtCtrls, StrUtils,
-  OcComPortObj, Vcl.ComCtrls;
+  Vcl.ComCtrls,
+  uOcComPortObj;
 
 type
   // Metadata structure written to each APP segment's end
@@ -25,24 +27,26 @@ type
   end;
 
   TMergeBinFrm = class(TForm)
-    LabeledEdit1: TLabeledEdit;
-    LabeledEdit2: TLabeledEdit;
+    SaveDialog1: TSaveDialog;
+    OpenDialog1: TOpenDialog;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
     Button1: TButton;
     Button2: TButton;
-    Button3: TButton;
-    LabeledEdit3: TLabeledEdit;
-    SaveDialog1: TSaveDialog;
     Button4: TButton;
-    OpenDialog1: TOpenDialog;
-    LabeledEdit4: TLabeledEdit;
-    Memo1: TMemo;
-    Button5: TButton;
     Button6: TButton;
-    Button7: TButton;
-    ComboBox1: TComboBox;
-    Button8: TButton;
+    Button5: TButton;
     Button9: TButton;
     ProgressBar1: TProgressBar;
+    Memo1: TMemo;
+    Button7: TButton;
+    Button3: TButton;
+    ComboBox1: TComboBox;
+    Button8: TButton;
+    LabeledEdit4: TLabeledEdit;
+    LabeledEdit3: TLabeledEdit;
+    LabeledEdit1: TLabeledEdit;
+    LabeledEdit2: TLabeledEdit;
     procedure Button4Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -74,8 +78,7 @@ var
 
 implementation
 
-uses Winapi.ShellAPI, System.UITypes, System.IOUtils, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj,
-  OcProtocol, uCRC;
+uses uOcProtocol, uCRC;
 
 {$R *.dfm}
 
@@ -300,14 +303,14 @@ end;
 
 procedure TMergeBinFrm.Button9Click(Sender: TObject);
 var
-  OcComPortObj: TOcComPortObj;
+  //OcComPortObj: TOcComPortObj;
   FileStream: TFileStream;
   FileNameLoaded: String;
 begin
   /// GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
   begin
-    OcComPortObj.Log('No device is found,please open a device.');
+    //OcComPortObj.Log('No device is found,please open a device.');
     MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     Exit;
   end;
@@ -340,18 +343,8 @@ begin
     Exit;
   end;
 
-  /// ComboBox301.ItemIndex := 0;
-  /// ComboBox2.ItemIndex := Ord(OctopusProtocol);
-  /// ComboBox2.OnChange(Self);
-  /// if IsBinFile(FileNameLoaded) then
-  /// begin
   OcComPortObj.SendFormat := Ord(S_OctopusProtocol);
   SendFileAsBin(OcComPortObj, FileNameLoaded);
-  /// end
-  /// else
-  /// begin
-  /// SendFileAsCommon(OcComPortObj);
-  /// end;
 end;
 
 procedure TMergeBinFrm.ComboBox1DropDown(Sender: TObject);

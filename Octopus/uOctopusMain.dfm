@@ -1,9 +1,9 @@
 object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
   Left = 174
   Top = 107
-  Caption = 'Octopus Serial Port Debugging and Development Assistant'
+  Caption = 'Octopus Usart Debugging and Development Assistant'
   ClientHeight = 630
-  ClientWidth = 1205
+  ClientWidth = 1131
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
   OnShow = FormShow
   TextHeight = 17
   object Splitter1: TSplitter
-    Left = 772
+    Left = 698
     Top = 66
     Height = 531
     Align = alRight
@@ -31,7 +31,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
   object StandardToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 1205
+    Width = 1131
     Height = 33
     AutoSize = True
     BorderWidth = 2
@@ -121,7 +121,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object FontSize: TEdit
       Left = 385
       Top = 0
-      Width = 234
+      Width = 250
       Height = 25
       Hint = 'Font Size|Select font size'
       NumbersOnly = True
@@ -130,7 +130,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnChange = FontSizeChange
     end
     object UpDown1: TUpDown
-      Left = 619
+      Left = 635
       Top = 0
       Width = 16
       Height = 25
@@ -139,37 +139,37 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       TabOrder = 2
     end
     object BoldButton: TToolButton
-      Left = 651
+      Left = 667
       Top = 0
       Action = FormatRichEditBoldCmd
       Style = tbsCheck
     end
     object ItalicButton: TToolButton
-      Left = 674
+      Left = 690
       Top = 0
       Action = FormatRichEditItalicCmd
       Style = tbsCheck
     end
     object UnderlineButton: TToolButton
-      Left = 697
+      Left = 713
       Top = 0
       Action = FormatRichEditUnderlineCmd
       Style = tbsCheck
     end
     object StrikeoutButton: TToolButton
-      Left = 720
+      Left = 736
       Top = 0
       Action = FormatRichEditStrikeOutCmd
     end
     object ToolButton1: TToolButton
-      Left = 743
+      Left = 759
       Top = 0
       Width = 8
       ImageIndex = 12
       Style = tbsDivider
     end
     object LeftAlign: TToolButton
-      Left = 751
+      Left = 767
       Top = 0
       Action = FormatRichEditAlignLeftCmd
       Grouped = True
@@ -177,7 +177,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
     object CenterAlign: TToolButton
       Tag = 2
-      Left = 774
+      Left = 790
       Top = 0
       Action = FormatRichEditAlignCenterCmd
       Grouped = True
@@ -185,27 +185,27 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
     object RightAlign: TToolButton
       Tag = 1
-      Left = 797
+      Left = 813
       Top = 0
       Action = FormatRichEditAlignRightCmd
       Grouped = True
       Style = tbsCheck
     end
     object ToolButton2: TToolButton
-      Left = 820
+      Left = 836
       Top = 0
       Width = 8
       ImageIndex = 15
       Style = tbsDivider
     end
     object BulletsButton: TToolButton
-      Left = 828
+      Left = 844
       Top = 0
       Action = FormatRichEditBulletsCmd
       Style = tbsCheck
     end
     object ToolButton4: TToolButton
-      Left = 851
+      Left = 867
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
@@ -213,17 +213,17 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object SupersciptButton: TToolButton
-      Left = 859
+      Left = 875
       Top = 0
       Action = SuperscriptCmd
     end
     object SubscriptButton: TToolButton
-      Left = 882
+      Left = 898
       Top = 0
       Action = SubscriptCmd
     end
     object ToolButton3: TToolButton
-      Left = 905
+      Left = 921
       Top = 0
       Width = 8
       Caption = 'ToolButton3'
@@ -231,7 +231,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object FGColorBox: TColorBox
-      Left = 913
+      Left = 929
       Top = 0
       Width = 180
       Height = 25
@@ -243,7 +243,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnChange = FGColorBoxChange
     end
     object ToolButton6: TToolButton
-      Left = 1093
+      Left = 1109
       Top = 0
       Width = 8
       Caption = 'ToolButton6'
@@ -251,7 +251,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object BGColorBox: TColorBox
-      Left = 1101
+      Left = 1117
       Top = 0
       Width = 180
       Height = 25
@@ -265,7 +265,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
   object StandardToolBar2: TToolBar
     Left = 0
     Top = 33
-    Width = 1205
+    Width = 1131
     Height = 33
     AutoSize = True
     BorderWidth = 2
@@ -351,24 +351,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       ImageIndex = 29
       OnClick = ToolButton16Click
     end
-    object ToolButton18: TToolButton
-      Left = 470
-      Top = 0
-      Width = 8
-      Caption = 'ToolButton18'
-      ImageIndex = 30
-      Style = tbsSeparator
-    end
-    object ToolButton13: TToolButton
-      Left = 478
-      Top = 0
-      Hint = 'Close and remove current page'
-      Caption = '&Close'
-      ImageIndex = 20
-      OnClick = ToolButton13Click
-    end
     object ToolButton14: TToolButton
-      Left = 501
+      Left = 470
       Top = 0
       Width = 8
       Caption = 'ToolButton14'
@@ -376,7 +360,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object ToolButton19: TToolButton
-      Left = 509
+      Left = 478
       Top = 0
       Hint = 'Quick terminal '
       Caption = 'ToolButton19'
@@ -384,7 +368,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnClick = ToolButton19Click
     end
     object ToolButton17: TToolButton
-      Left = 532
+      Left = 501
       Top = 0
       Width = 8
       Caption = 'ToolButton17'
@@ -392,18 +376,27 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object ToolButton12: TToolButton
-      Left = 540
+      Left = 509
       Top = 0
       Hint = 'Clear content'
       Caption = ' ToolButton12 '
       ImageIndex = 23
       OnClick = ToolButton12Click
     end
+    object ToolButton13: TToolButton
+      Left = 532
+      Top = 0
+      Hint = 'Close and remove current page'
+      Caption = '&Close'
+      ImageIndex = 20
+      Visible = False
+      OnClick = ToolButton13Click
+    end
   end
   object Panel1: TPanel
     Left = 0
     Top = 66
-    Width = 772
+    Width = 698
     Height = 531
     Align = alClient
     BevelOuter = bvNone
@@ -411,7 +404,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object PageControl1: TPageControl
       Left = 0
       Top = 0
-      Width = 772
+      Width = 698
       Height = 531
       Align = alClient
       PopupMenu = PopupMenu1
@@ -422,7 +415,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
   end
   object SV_R: TSplitView
-    Left = 775
+    Left = 701
     Top = 66
     Width = 430
     Height = 531
@@ -1857,7 +1850,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     AlignWithMargins = True
     Left = 3
     Top = 599
-    Width = 1199
+    Width = 1125
     Height = 28
     Margins.Top = 2
     Align = alBottom
@@ -1866,7 +1859,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object StatusBar1: TStatusBar
       Left = 0
       Top = 0
-      Width = 1199
+      Width = 1125
       Height = 28
       Margins.Top = 5
       Align = alClient
@@ -2181,7 +2174,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnClick = SkinsMenuClick
     end
     object COMMenu: TMenuItem
-      Caption = '&COM'
+      Caption = '&USART'
       OnClick = COMMenuClick
     end
     object HelpMenu: TMenuItem

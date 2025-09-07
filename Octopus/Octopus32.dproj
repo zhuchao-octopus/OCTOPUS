@@ -3,12 +3,13 @@
         <ProjectGuid>{38132403-3CBF-4201-A27F-142056E3267C}</ProjectGuid>
         <MainSource>Octopus32.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>20.1</ProjectVersion>
+        <ProjectVersion>20.2</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectName Condition="'$(ProjectName)'==''">Octopus32</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -118,7 +119,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
-        <Custom_Styles>&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;Copper|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Copper.vsf;CopperDark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperDark.vsf;Coral|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Coral.vsf;Diamond|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Diamond.vsf;Emerald|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Emerald.vsf;Glow|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glow.vsf;&quot;Iceberg Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\IcebergClassico.vsf&quot;;Jet|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Jet.vsf;&quot;Lavender Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LavenderClassico.vsf&quot;;Mountain_Mist|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MOUNTAIN_MIST.vsf;Radiant|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Radiant.vsf;Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf;&quot;Slate Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SlateClassico.vsf&quot;;Sterling|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sterling.vsf;&quot;Tablet Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletDark.vsf&quot;;&quot;Tablet Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletLight.vsf&quot;;Untitled|VCLSTYLE|$(BDSCOMMONDIR)\Styles\DefaultStyle.vsf;Vapor|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Vapor.vsf;&quot;Windows Designer|VCLSTYLE|$(BDSCOMMONDIR)\Styles\WINDOWS_DESIGNER.vsf&quot;;&quot;Windows Designer Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\WINDOWS_DESIGNER_DARK.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\DefaultModernStyle.vsf;&quot;Windows10 Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Blue.vsf&quot;;&quot;Windows10 Charcoal|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10_Charcoal.vsf&quot;;&quot;Windows10 Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\DefaultModernDarkStyle.vsf&quot;;&quot;Windows10 Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Green.vsf&quot;;&quot;Windows10 Purple|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Purple.vsf&quot;;&quot;Windows10 SlateGray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10SlateGray.vsf&quot;;&quot;Windows11 Impressive Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Impressive_Dark.vsf&quot;;&quot;Windows11 Impressive Dark SE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Impressive_Dark_SE.vsf&quot;;&quot;Windows11 Impressive Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Impressive_Light.vsf&quot;;&quot;Windows11 Impressive Light SE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Impressive_Light_SE.vsf&quot;;&quot;Windows11 MineShaft|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_MineShaft.vsf&quot;;&quot;Windows11 Modern Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Modern_Dark.vsf&quot;;&quot;Windows11 Modern Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Modern_Light.vsf&quot;;&quot;Windows11 Polar Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Polar_Dark.vsf&quot;;&quot;Windows11 Polar Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_Polar_Light.vsf&quot;;&quot;Windows11 White Smoke|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows11_WhiteSmoke.vsf&quot;;&quot;Alabaster Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\Alabaster_Android.vsf&quot;;&quot;Alabaster iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\Alabaster_iOS.vsf&quot;;&quot;Alabaster Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\Alabaster_Linux.vsf&quot;;&quot;Alabaster Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\Alabaster_Mac.vsf&quot;;&quot;Alabaster Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\Alabaster_Win.vsf&quot;;Amakrits|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Amakrits.vsf;&quot;Amethyst Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AmethystKamri.vsf&quot;;&quot;Android Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\DefaultFmxAndroidDarkStyle.vsf&quot;;&quot;Android Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\DefaultFmxAndroidStyle.vsf&quot;;&quot;AndroidL Dark Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\DefaultFmxAndroidLDarkStyle.vsf&quot;;&quot;AndroidL Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\DefaultFmxAndroidLStyle.vsf&quot;;AndroidWear|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\DefaultFmxAndroidWearStyle.vsf;&quot;Aqua Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaGraphite.vsf&quot;;Auric|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Auric.vsf;&quot;Calypso Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\Calypso_Android.vsf&quot;;&quot;Calypso SE Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\CalypsoSE_Android.vsf&quot;;Carbon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Carbon.vsf;&quot;Charcoal Dark Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CobaltXEMedia.vsf&quot;;&quot;Concrete Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\Concrete_Android.vsf&quot;;&quot;Concrete iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\Concrete_iOS.vsf&quot;;&quot;Concrete Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\Concrete_Linux.vsf&quot;;&quot;Concrete macOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\Concrete_macOS.vsf&quot;;&quot;Concrete Windows|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\Concrete_Win.vsf&quot;;CopperVarI|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarI.vsf;CopperVarIBlack|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarIBlack.vsf;CopperVarII|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarII.vsf;CopperVarIIBlack|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarIIBlack.vsf;CopperVarIII|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarIII.vsf;CopperVarIIIBlack|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarIIIBlack.vsf;CopperVarIV|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarIV.vsf;CopperVarIVBlack|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarIVBlack.vsf;CopperVarV|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarV.vsf;CopperVarVBlack|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarVBlack.vsf;CopperVarVI|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarVI.vsf;CopperVarVIBlack|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarVIBlack.vsf;CopperVarVII|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarVII.vsf;CopperVarVIIBlack|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CopperVarVIIBlack.vsf;&quot;Cyan Dusk|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GoldenGraphite.vsf&quot;;&quot;Impressive Dark Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\ImpressiveDark_Android.vsf&quot;;&quot;Impressive Dark Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\ImpressiveDark_Linux.vsf&quot;;&quot;Impressive Dark Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\ImpressiveDark_Mac.vsf&quot;;&quot;Impressive Dark Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\ImpressiveDark_Win.vsf&quot;;&quot;Impressive Dark Win SE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\ImpressiveDark_Win_SE.vsf&quot;;&quot;Impressive Dark_iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\ImpressiveDark_iOS.vsf&quot;;&quot;Impressive Light Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\ImpressiveLight_Android.vsf&quot;;&quot;Impressive Light iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\ImpressiveLight_iOS.vsf&quot;;&quot;Impressive Light Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\ImpressiveLight_Linux.vsf&quot;;&quot;Impressive Light Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\ImpressiveLight_Mac.vsf&quot;;&quot;Impressive Light Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\ImpressiveLight_Win.vsf&quot;;&quot;Impressive Light Win SE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\ImpressiveLight_Win_SE.vsf&quot;;iOS7Alternate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\DefaultFmxIos7Style.vsf;Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Light.vsf;Luna|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Luna.vsf;&quot;Material Patterns Blue Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\MaterialPatternsBlue_Android.vsf&quot;;&quot;MaterialOxfordBlue Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\MaterialOxfordBlue_Android.vsf&quot;;&quot;MaterialOxfordBlue SE Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\MaterialOxfordBlueSE_Android.vsf&quot;;&quot;MineShaft Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\MineShaft_Linux.vsf&quot;;&quot;MineShaft Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\MineShaft_Mac.vsf&quot;;&quot;MineShaft Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\MineShaft_Win.vsf&quot;;MineShaft_Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\MineShaft_Android.vsf;MineShaft_iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\MineShaft_iOS.vsf;&quot;Nero Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\Nero_Android.vsf&quot;;&quot;Nero iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\Nero_iOS.vsf&quot;;&quot;Nero Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\Nero_Linux.vsf&quot;;&quot;Nero macOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\Nero_Mac.vsf&quot;;&quot;Nero Windows|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\Nero_Win.vsf&quot;;Obsidian|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Obsidian.vsf;&quot;Onyx Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\OnyxBlue.vsf&quot;;&quot;PolarDark Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\PolarDark_Android.vsf&quot;;&quot;PolarDark Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\PolarDark_Linux.vsf&quot;;&quot;PolarDark Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\PolarDark_Mac.vsf&quot;;&quot;PolarDark Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\PolarDark_Win.vsf&quot;;PolarDark_iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\PolarDark_iOS.vsf;&quot;PolarLight Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\PolarLight_Android.vsf&quot;;&quot;PolarLight iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\PolarLight_iOS.vsf&quot;;&quot;PolarLight Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\PolarLight_Linux.vsf&quot;;&quot;PolarLight Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\PolarLight_Mac.vsf&quot;;&quot;PolarLight Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\PolarLight_Win.vsf&quot;;&quot;Puerto Rico Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\PuertoRico_Android.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SapphireKamri.vsf&quot;;Silver|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Silver.vsf;&quot;Smokey Quartz Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TurquoiseGray.vsf&quot;;&quot;Windows 10 Modern|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\DefaultFmxWinModernStyle.vsf&quot;;&quot;Windows 10 Modern Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\DefaultFmxWinModernDarkStyle.vsf&quot;;&quot;Aqua Light Slate 2|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate2.vsf&quot;;&quot;Calypso  iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\Calypso_iOS.vsf&quot;;&quot;Calypso Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\Calypso_Linux.vsf&quot;;&quot;Calypso Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\Calypso_Mac.vsf&quot;;&quot;Calypso SE  iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\CalypsoSE_iOS.vsf&quot;;&quot;Calypso SE Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\CalypsoSE_Linux.vsf&quot;;&quot;Calypso SE Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\CalypsoSE_Mac.vsf&quot;;&quot;Calypso SE Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\CalypsoSE_Win.vsf&quot;;&quot;Calypso Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\Calypso_Win.vsf&quot;;&quot;Glossy 2|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy2.vsf&quot;;&quot;GNome Hybrid|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GNomeHybrid.vsf&quot;;&quot;Material Patterns Blue iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\MaterialPatternsBlue_iOS.vsf&quot;;&quot;Material Patterns Blue Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\MaterialPatternsBlue_Linux.vsf&quot;;&quot;Material Patterns Blue Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\MaterialPatternsBlue_Mac.vsf&quot;;&quot;Material Patterns Blue Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\MaterialPatternsBlue_Win.vsf&quot;;&quot;Material White Texture|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MaterialWhiteTexture.vsf&quot;;&quot;MaterialOxfordBlue iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\MaterialOxfordBlue_iOS.vsf&quot;;&quot;MaterialOxfordBlue Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\MaterialOxfordBlue_Linux.vsf&quot;;&quot;MaterialOxfordBlue Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\MaterialOxfordBlue_Mac.vsf&quot;;&quot;MaterialOxfordBlue SE iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\MaterialOxfordBlueSE_iOS.vsf&quot;;&quot;MaterialOxfordBlue SE Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\MaterialOxfordBlueSE_Linux.vsf&quot;;&quot;MaterialOxfordBlue SE Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\MaterialOxfordBlueSE_Mac.vsf&quot;;&quot;MaterialOxfordBlue SE Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\MaterialOxfordBlueSE_Win.vsf&quot;;&quot;MaterialOxfordBlue Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\MaterialOxfordBlue_Win.vsf&quot;;&quot;Puerto Rico iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\PuertoRico_iOS.vsf&quot;;&quot;Puerto Rico Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\PuertoRico_Linux.vsf&quot;;&quot;Puerto Rico Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\PuertoRico_Mac.vsf&quot;;&quot;Puerto Rico Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\PuertoRico_Win.vsf&quot;;&quot;Sky 2|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky2.vsf&quot;;Stellar|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\Stellar_Mac.vsf;&quot;Stellar Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\Stellar_Android.vsf&quot;;&quot;Stellar iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\Stellar_iOS.vsf&quot;;&quot;Stellar Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\Stellar_Linux.vsf&quot;;&quot;Ubuntu Clear Fantasy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\UbuntuClearFantasy.vsf&quot;;&quot;WedgewoodLight Android|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Android\WedgewoodLight_Android.vsf&quot;;&quot;WedgewoodLight iOS|VCLSTYLE|$(BDSCOMMONDIR)\Styles\iOS\WedgewoodLight_iOS.vsf&quot;;&quot;WedgewoodLight Linux|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Linux\WedgewoodLight_Linux.vsf&quot;;&quot;WedgewoodLight Mac|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MacOS\WedgewoodLight_Mac.vsf&quot;;&quot;WedgewoodLight Win|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Win\WedgewoodLight_Win.vsf&quot;;&quot;Windows10 IDE Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\WindowsIDEDark.vsf&quot;;Calypso|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Calypso.vsf;&quot;Calypso LE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CalypsoLE.vsf&quot;;&quot;Calypso SE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CalypsoSE.vsf&quot;;&quot;Calypso SLE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CalypsoSLE.vsf&quot;;&quot;Flat UI Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\FlatUILight.vsf&quot;;Glossy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy.vsf;&quot;Lucky Point|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LuckyPoint.vsf&quot;;&quot;Material Oxford Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MaterialOxfordBlue.vsf&quot;;&quot;Material Oxford Blue SE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MaterialOxfordBlueSE.vsf&quot;;&quot;Material Patterns Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MaterialPatternsBlue.vsf&quot;;&quot;Puerto Rico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\PuertoRico.vsf&quot;;&quot;Stellar Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\StellarDark.vsf&quot;;&quot;Wedgewood Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\WedgewoodLight.vsf&quot;;Win10IDE_Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\WIN10IDE_DARK.vsf;Win10IDE_Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\WIN10IDE_LIGHT.vsf;&quot;Windows10 BlackPearl|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10BlackPearl.vsf&quot;;&quot;Windows10 Blue Whale|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10BlueWhale.vsf&quot;;&quot;Windows10 Blue Whale LE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10BlueWhaleLE.vsf&quot;;&quot;Windows10 Clear Day|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10ClearDay.vsf&quot;;&quot;Windows10 Malibu|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Malibu.vsf&quot;;Zircon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Zircon.vsf;&quot;Zircon SE|VCLSTYLE|$(BDSCOMMONDIR)\Styles\ZirconSE.vsf&quot;;&quot;Floral Shop Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\FloralShopClassico.vsf&quot;</Custom_Styles>
+        <Custom_Styles>&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;Glow|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glow.vsf;&quot;Iceberg Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LavenderClassico.vsf&quot;;Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf;&quot;Slate Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SlateClassico.vsf&quot;;&quot;Tablet Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletDark.vsf&quot;;&quot;Tablet Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletLight.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10.vsf;&quot;Windows10 Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Blue.vsf&quot;;&quot;Windows10 Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Dark.vsf&quot;;&quot;Windows10 Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Green.vsf&quot;;&quot;Windows10 Purple|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Purple.vsf&quot;;&quot;Windows10 SlateGray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10SlateGray.vsf&quot;;Amakrits|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Amakrits.vsf;&quot;Amethyst Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaGraphite.vsf&quot;;Auric|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Auric.vsf;Carbon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Carbon.vsf;&quot;Charcoal Dark Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GoldenGraphite.vsf&quot;;Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Light.vsf;Luna|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Luna.vsf;Obsidian|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Obsidian.vsf;&quot;Onyx Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\OnyxBlue.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SapphireKamri.vsf&quot;;Silver|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Silver.vsf;&quot;Smokey Quartz Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TurquoiseGray.vsf&quot;;Glossy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy.vsf</Custom_Styles>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
@@ -163,26 +164,23 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_MajorVer>5</VerInfo_MajorVer>
-        <VerInfo_MinorVer>2</VerInfo_MinorVer>
-        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司 (Shenzhen ZhuChaoTechnology Co., LTD );FileDescription=八爪鱼串口调试开发助手 (Octopus serial port debugging and development assistant);FileVersion=5.2.1.182;InternalName=Octopus;LegalCopyright=2023-2030;LegalTrademarks=八爪鱼软件;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName);ProductVersion=5.2.1.0;Comments=http://www.1234998.top;ProgramID=com.zhuchao.$(MSBuildProjectName)</VerInfo_Keys>
-        <Icon_MainIcon>..\favicon-20180620050618953.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>..\79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>..\79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo150>
-        <VerInfo_Build>182</VerInfo_Build>
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <Icon_MainIcon>..\ICO\favicon-20180620050618953.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>..\ICO\79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>..\ICO\79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司 (Shenzhen ZhuChaoTechnology Co., LTD );FileDescription=八爪鱼串口调试开发助手 (Octopus serial port debugging and development assistant);FileVersion=5.2.0.0;InternalName=Octopus;LegalCopyright=2023-2030;LegalTrademarks=八爪鱼软件;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.0.0;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司 (Shenzhen ZhuChaoTechnology Co., LTD );FileDescription=八爪鱼串口调试开发助手 (Octopus Usart Debugging and Development Assistant);FileVersion=5.2.1.252;InternalName=Octopus;LegalCopyright=2023-2030;LegalTrademarks=八爪鱼软件;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.1;Comments=http://www.1234998.top</VerInfo_Keys>
         <VerInfo_MajorVer>5</VerInfo_MajorVer>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
-        <Icon_MainIcon>BZY_Icon1.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>..\79c25bc8359f51a4_White.png</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>..\79c25bc8359f51a4_White.png</UWP_DelphiLogo150>
+        <Icon_MainIcon>..\ICO\Octopus_Icon3.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>..\ICO\79c25bc8359f51a4_white.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>..\ICO\79c25bc8359f51a4_white.png</UWP_DelphiLogo150>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
+        <VerInfo_Build>252</VerInfo_Build>
+        <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -206,23 +204,20 @@
         <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司(Shenzhen ZhuChaoTechnology Co., LTD);FileDescription=八爪鱼串口调试开发助手(Octopus serial port debugging and development assistant );FileVersion=5.2.0.126;InternalName=BZY;LegalCopyright=2023-2030;LegalTrademarks=BZY;OriginalFilename=BZY64.EXE;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.0;Comments=http://www.1234998.top</VerInfo_Keys>
-        <Icon_MainIcon>BZY_Icon1.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>..\79c25bc8359f51a4_White.png</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>..\79c25bc8359f51a4_White.png</UWP_DelphiLogo150>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司(Shenzhen ZhuChaoTechnology Co., LTD);FileDescription=八爪鱼串口调试开发助手(Octopus serial port debugging and development assistant );FileVersion=5.2.0.175;InternalName=BZY;LegalCopyright=2023-2030;LegalTrademarks=BZY;OriginalFilename=BZY64.EXE;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.0;Comments=http://www.1234998.top</VerInfo_Keys>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <VerInfo_MajorVer>5</VerInfo_MajorVer>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Build>126</VerInfo_Build>
+        <VerInfo_Build>175</VerInfo_Build>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -234,96 +229,61 @@
         <DCCReference Include="uOctopusMain.pas">
             <Form>MainOctopusDebuggingDevelopmentForm</Form>
         </DCCReference>
-        <DCCReference Include="Vcl.Tabs.pas"/>
         <DCCReference Include="uMainSetting.pas">
             <Form>SettingPagesDlg</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uCommand.pas">
+            <Form>CommandFrm</Form>
+        </DCCReference>
+        <DCCReference Include="uDownloadsManager.pas"/>
+        <DCCReference Include="uDownloader.pas">
+            <Form>DownloaderFrm</Form>
+        </DCCReference>
+        <DCCReference Include="uPageSetup.pas">
+            <Form>PageSetupFrm</Form>
+        </DCCReference>
+        <DCCReference Include="uMergeBin.pas">
+            <Form>MergeBinFrm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\octopus-zsbwm\CRC\uCRC.pas">
+            <Form>CRCFRM</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\octopus-zsbwm\RSAOSSL\uEncryptionDecryption.pas">
+            <Form>DecryptEncryptFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\octopus-zsbwm\SMTP\uSMTP.pas">
+            <Form>SubmitProblemFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\octopus-zsbwm\SCREEN\uScreenMain.pas">
+            <Form>ScreenMainFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\octopus-zsbwm\SCREEN\uANNDataSetting.pas">
+            <Form>ANNDataSettingFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\octopus-zsbwm\SCREEN\uCutSetting.pas">
+            <Form>CutSettingForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\octopus-zsbwm\SCREEN\Screenshot.pas">
+            <Form>ScreenshotFrm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\ComPort\CPort.pas"/>
         <DCCReference Include="..\ComPort\CPortSetup.pas">
             <Form>ComSetupFrm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\ComPort\CPortCtl.pas"/>
         <DCCReference Include="..\ComPort\CPortEsc.pas"/>
         <DCCReference Include="..\ComPort\CPortTrmSet.pas">
             <Form>ComTrmSetForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="uComPortObj.pas"/>
-        <DCCReference Include="Vcl.MyPageEdit.pas"/>
-        <DCCReference Include="..\..\ZSBWM\SMTP\Mail4Delphi.Intf.pas"/>
-        <DCCReference Include="..\..\ZSBWM\SMTP\Mail4Delphi.pas"/>
-        <DCCReference Include="..\..\ZSBWM\SMTP\uSetting.pas">
-            <Form>ConfigurationFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\SCREEN\Screenshot.pas">
-            <Form>ScreenshotFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\SCREEN\uCutSetting.pas">
-            <Form>CutSettingForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\SCREEN\uScreenMain.pas">
-            <Form>ScreenMainFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\RSAOSSL\libeay32.pas"/>
-        <DCCReference Include="..\..\ZSBWM\RSAOSSL\uEncryptionDecryption.pas">
-            <Form>DecryptEncryptFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\RSAOSSL\RSAOpenSSL.pas"/>
-        <DCCReference Include="..\..\ZSBWM\RSAOSSL\RSATestUnit.pas">
-            <Form>RSATestForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\RSAOSSL\RSAUnit.pas"/>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\NetHttpInterface.pas"/>
-        <DCCReference Include="..\..\ZSBWM\SMTP\uSMTP.pas">
-            <Form>SubmitProblemFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\CRC\uCRC.pas">
-            <Form>CRCFRM</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\ANN\CNN\Common\uClass_CNN.pas"/>
-        <DCCReference Include="..\..\ZSBWM\ANN\CNN\Common\uClass_Imaging.pas"/>
-        <DCCReference Include="..\..\ZSBWM\ANN\CNN\Common\uClasses_Types.pas"/>
-        <DCCReference Include="..\..\ZSBWM\ANN\CNN\Common\uFunctions.pas"/>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\GlabalSession.pas"/>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\GlobalFunctions.pas"/>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\GlobalTypeConst.pas"/>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\GlobalTypes.pas"/>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\MessageQueue.pas"/>
-        <DCCReference Include="..\..\ZSBWM\POWERENGINE\DataEngine.pas"/>
-        <DCCReference Include="uCommand.pas">
-            <Form>CommandFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="uDownloadsManager.pas"/>
-        <DCCReference Include="uDownloader.pas">
-            <Form>DownloaderFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="uPageSetup.pas">
-            <Form>PageSetupFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\NetInterface.pas"/>
-        <DCCReference Include="..\..\ZSBWM\SCREEN\uANNDataSetting.pas">
-            <Form>ANNDataSettingFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\..\ZSBWM\PUBLIC\CRC.pas"/>
-        <DCCReference Include="OcProtocol.pas"/>
-        <DCCReference Include="uMergeBin.pas">
-            <Form>MergeBinFrm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
+        <DCCReference Include="OcComPortObj.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -362,23 +322,39 @@
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
             </Platforms>
-            <Deployment Version="4">
-                <DeployFile LocalName="..\79c25bc8359f51a4_Oringer.png" Configuration="Debug" Class="UWP_DelphiLogo44">
-                    <Platform Name="Win32">
+            <Deployment Version="5">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png" Configuration="Debug" Class="UWP_DelphiLogo150">
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo150x150.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win64">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo44x44.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\79c25bc8359f51a4_White.png" Configuration="Debug" Class="UWP_DelphiLogo44"/>
-                <DeployFile LocalName="Win32\Debug\Octopus32.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\ICO\79c25bc8359f51a4_Oringer.png" Configuration="Release" Class="UWP_DelphiLogo44">
                     <Platform Name="Win32">
-                        <RemoteName>Octopus32.exe</RemoteName>
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Release\Octopus32.exe" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Win32">
+                <DeployFile LocalName="..\ICO\79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Debug\Octopus64.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="Win64\Debug\Octopus32.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
                         <RemoteName>Octopus32.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -402,16 +378,6 @@
                         <Operation>0</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="AndroidClasses">
-                    <Platform Name="Android">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
-                    </Platform>
-                    <Platform Name="Android64">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
-                    </Platform>
-                </DeployClass>
                 <DeployClass Name="AndroidFileProvider">
                     <Platform Name="Android">
                         <RemoteDir>res\xml</RemoteDir>
@@ -419,12 +385,6 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\xml</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="AndroidGDBServer">
-                    <Platform Name="Android">
-                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -1050,6 +1010,9 @@
                     <Platform Name="Win64">
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Win64x">
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectiOSDeviceDebug">
                     <Platform Name="iOSDevice32">
@@ -1343,6 +1306,7 @@
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
             </Deployment>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

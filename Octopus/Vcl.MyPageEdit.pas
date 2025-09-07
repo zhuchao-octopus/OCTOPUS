@@ -3,10 +3,15 @@
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, Winapi.RichEdit, System.SysUtils, System.StrUtils, System.Classes, Vcl.Graphics, Vcl.Controls,
+  System.SysUtils, System.StrUtils, System.Classes, System.UITypes, System.IOUtils, System.Actions, System.ImageList,
+  Winapi.Windows, Winapi.Messages, Winapi.RichEdit, Winapi.ShellAPI,
+
+  Vcl.Graphics, Vcl.Controls,
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.ClipBrd,
-  Vcl.ToolWin, Vcl.ActnList, System.Actions, System.ImageList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
-  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes, SHDocVw, SyncObjs, Vcl.Printers;
+  Vcl.ToolWin, Vcl.ActnList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
+  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes, Vcl.Printers,
+
+  SHDocVw, SyncObjs;
 
 type
   TEventCallBackFuntion = Procedure(Msg: String) of object;
@@ -44,6 +49,7 @@ type
     procedure SaveTo(const PathFileName: String; Encoding: TEncoding); overload;
     procedure LoadFrom(const PathFileName: String); overload;
     procedure LoadFrom(const PathFileName: String; Encoding: TEncoding); overload;
+    procedure LoadAsBinFrom(const PathFileName: String);
 
     procedure ConvertEncoding(TargetEncoding: TEncoding);
     procedure ConvertToUTF8WithBOM();
@@ -94,7 +100,7 @@ type
 
     procedure Clear();
     procedure AppendLog(const Text: string; LogType: TLogType);
-    procedure Log(const Msg: string; LogType: TLogType = ltRecv);
+    procedure Log(const Msg: string; LogType: TLogType = ltNone);
     procedure LogLine(const Msg: String; Line: Integer);
     procedure LogEndLine(const Msg: String);
     procedure LogBuffer(const Buffer: array of Byte; Count: Integer);
@@ -103,10 +109,12 @@ type
     procedure SaveTo(const PathFileName: String; Encoding: TEncoding); overload;
 
     procedure LoadFrom(PathFileName: String; Encoding: TEncoding); overload;
+    procedure LoadAsBinFrom(const PathFileName: String);
+
     procedure ConvertEncoding(TargetEncoding: TEncoding);
     procedure ConvertToUTF8WithBOM();
     procedure ConvertEncoding3(TargetEncoding: TEncoding);
-    procedure ShowLinesNumber();
+
     procedure SetDefaultFormat();
     procedure SetHexadecimalMode(); overload;
     procedure SetHexadecimalMode(HexMode: Boolean); overload;
@@ -154,13 +162,14 @@ type
     function GetPageIndex(PageName: String): Integer;
 
     function LoadFileFrom(PathFileName: String; PageName: String): TMyRichEdit;
+    function LoadFileAsBinFrom(PathFileName: String; PageName: String): TMyRichEdit;
     function GetPathFileName(Index: Integer): String;
   published
   end;
 
 implementation
 
-uses DataEngine, Winapi.ShellAPI, System.UITypes, System.IOUtils;
+uses DataEngine, uOctopusFunction;
 
 /// //////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////////////////////////////////////////////////////
@@ -375,6 +384,34 @@ begin
   end;
 end;
 
+procedure TMyMemo.LoadAsBinFrom(const PathFileName: String);
+var
+  FS: TFileStream;
+  FileSize: Integer;
+begin
+  if not FileExists(PathFileName) then
+    raise Exception.CreateFmt('File not found: %s', [PathFileName]);
+
+  FS := TFileStream.Create(PathFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    FileSize := FS.Size;
+    SetLength(FSourceBytes, FileSize);
+    if FileSize > 0 then
+      FS.ReadBuffer(FSourceBytes[0], FileSize);
+
+    // 清空 Memo
+    Self.Clear;
+
+    // 用十六进制显示
+    LogBuffer(FSourceBytes, Length(FSourceBytes));
+
+    // 可以根据需求给 Memo 一个标记，比如保存路径
+    FTAG := PathFileName;
+  finally
+    FS.Free;
+  end;
+end;
+
 procedure TMyMemo.ConvertEncoding(TargetEncoding: TEncoding);
 var
   SourceBytes, TargetBytes: TBytes;
@@ -584,10 +621,11 @@ begin
   FLogQueue := TStringList.Create;
   FCacheList := TStringList.Create; // 只创建一次
 
-  FIsDestroying := false;
-  FSendColor := clGreen;
-  FReceiveColor := clBlue;
   FDefaultColor := clBlack;
+  FIsDestroying := false;
+  FSendColor := FDefaultColor;
+  FReceiveColor := clBlue;
+
 end;
 
 destructor TMyRichEdit.Destroy;
@@ -625,13 +663,17 @@ var
 begin
   case LogType of
     ltSend:
-      AColor := clBlue; // 发送 - 蓝色
+      AColor := FSendColor; // 发送 - 蓝色
+
     ltRecv:
-      AColor := clGreen; // 接收 - 绿色
+      AColor := FReceiveColor; // 接收 - 绿色
+
     ltInfo:
-      AColor := clBlack; // 普通信息 - 黑色
+      AColor := FDefaultColor; // 普通信息 - 黑色
+
     ltError:
       AColor := clRed; // 错误 - 红色
+
     ltNone:
       AColor := clWindowText; // 黑白风格兼容（系统默认前景色）
   else
@@ -655,38 +697,36 @@ end;
 procedure TMyRichEdit.FlushLogQueue;
 var
   i: Integer;
-  tmp: TStringList;
   LogTypeValue: TLogType;
-  ColorToUse: TColor;
 begin
   if FIsDestroying then
     Exit;
-  LogTypeValue := ltNone;
+
   FLock.Enter;
   try
     if FLogQueue.Count = 0 then
       Exit;
-    tmp := FCacheList; // FCacheList 是类里的成员，预先创建好
-    tmp.Assign(FLogQueue);
-    FLogQueue.Clear;
+
+    FCacheList.Clear;
+    FCacheList.Assign(FLogQueue);
+
+    for i := 0 to FCacheList.Count - 1 do
+    begin
+      if Assigned(FCacheList.Objects[i]) then
+        LogTypeValue := TLogType(NativeInt(FCacheList.Objects[i]))
+      else
+        LogTypeValue := ltNone;
+
+      AppendLog(FCacheList[i], LogTypeValue);
+    end;
   finally
+    FCacheList.Clear;
+    FLogQueue.Clear;
     FLock.Leave;
   end;
-
-  for i := 0 to tmp.Count - 1 do
-  begin
-    if Assigned(tmp.Objects[i]) then
-      LogTypeValue := TLogType(Integer(tmp.Objects[i]));
-
-    AppendLog(tmp[1], LogTypeValue);
-  end;
-
-  // SelStart := Length(Text);
-  // Perform(EM_SCROLLCARET, 0, 0);
-  tmp.Free;
 end;
 
-procedure TMyRichEdit.Log(const Msg: string; LogType: TLogType = ltRecv);
+procedure TMyRichEdit.Log(const Msg: string; LogType: TLogType = ltNone);
 var
   ColorToUse: TColor;
 begin
@@ -876,6 +916,35 @@ begin
   end;
 end;
 
+procedure TMyRichEdit.LoadAsBinFrom(const PathFileName: String);
+var
+  FS: TFileStream;
+  FileSize: Integer;
+begin
+  if not FileExists(PathFileName) then
+    Exit;
+  // raise Exception.CreateFmt('File not found: %s', [PathFileName]);
+
+  FS := TFileStream.Create(PathFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    FileSize := FS.Size;
+    SetLength(FSourceBytes, FileSize);
+    if FileSize > 0 then
+      FS.ReadBuffer(FSourceBytes[0], FileSize);
+
+    // 清空 Memo
+    Self.Clear;
+
+    // 用十六进制显示
+    LogBuffer(FSourceBytes, Length(FSourceBytes));
+
+    // 可以根据需求给 Memo 一个标记，比如保存路径
+    FTAG := PathFileName;
+  finally
+    FS.Free;
+  end;
+end;
+
 procedure TMyRichEdit.ConvertEncoding(TargetEncoding: TEncoding);
 var
   SourceBytes, TargetBytes: TBytes;
@@ -989,46 +1058,6 @@ begin
   end;
 end;
 
-procedure TMyRichEdit.ShowLinesNumber();
-const
-  PFNS_PAREN = $000; // e.g. 1)
-  PFNS_PARENS = $100; // e.g. (1)
-  PFNS_PERIOD = $200; // e.g. 1.
-  PFNS_PLAIN = $300;
-  PFNS_NONUMBER = $400;
-
-const
-  PFN_NONE = $00000000; // 无
-  PFN_BULLET = $00000001; // 黑色实心圆点
-  PFN_ARABIC = $00000002; // 0,1,2
-  PFN_LCLETTER = $00000003; // a,b,c
-  PFN_UCLETTER = $00000004; // A,B,C
-  PFN_LCROMAN = $00000005; // i,ii,iii
-  PFN_UCROMAN = $00000006; // I,II,III
-
-var
-  pf: PARAFORMAT2;
-begin
-  FillChar(pf, SizeOf(PARAFORMAT2), #0);
-  pf.cbSize := SizeOf(PARAFORMAT2);
-  // PFM_NUMBERING: wNumbering 值有效
-  // PFM_NUMBERINGSTYLE: wNumberingStyle值有效
-  // PFM_NUMBERINGSTART: wNumberingStart值有效
-  // PFM_STARTINDENT: dxStartIndent值有效
-  pf.dwMask := PFM_NUMBERING or PFM_NUMBERINGSTYLE or PFM_NUMBERINGSTART or PFM_STARTINDENT; // or PFM_OFFSET;
-
-  pf.wNumberingStyle := PFNS_PERIOD; // 设置行号的样式，可以为“)”，“.”，“()”
-  pf.wNumberingStart := 1; // 设置行号起始值
-  pf.wNumbering := PFN_ARABIC; // 设置行号的格式，可以为阿拉伯数字或者英文字母等格式
-  pf.dxStartIndent := 90; // 设置行首缩进值
-
-  SelectAll;
-  SendMessage(Handle, EM_SETPARAFORMAT, 0, LPARAM(@pf));
-  SelStart := 0;
-  SelLength := 0;
-  FShowLinesNumber := true;
-end;
-
 procedure TMyRichEdit.SetDefaultFormat();
 begin
   Font.Charset := TFontCharset(DEFAULT_CHARSET);
@@ -1053,11 +1082,12 @@ var
 begin
 
   try
-    SourceEncoding := Self.Lines.Encoding;
+    // SourceEncoding := Self.Lines.Encoding;
     // 将Memo控件中的文本内容转换为源编码格式的字节序列
-    FSourceBytes := SourceEncoding.GetBytes(Text);
+    // FSourceBytes := SourceEncoding.GetBytes(Text);
     Self.Clear;
-    LogBuffer(FSourceBytes, Length(FSourceBytes));
+    // LogBuffer(FSourceBytes, Length(FSourceBytes));
+    Self.LoadAsBinFrom(FPathFileName);
     DataEngineManager.Remove2(FTAG);
   except
   end;
@@ -1220,9 +1250,12 @@ begin
   NewTab := GetPageByName(PageName);
   if NewTab <> nil then
   begin
-    DeletePageComponent(NewTab.PageIndex);
-    NewTab.Free;
-    NewTab := nil;
+    try
+      DeletePageComponent(NewTab.PageIndex);
+    finally
+      NewTab.Free;
+      NewTab := nil;
+    end;
   end;
 end;
 
@@ -1421,6 +1454,15 @@ begin
   if Result <> nil then
   begin
     Result.LoadFrom(PathFileName);
+  end;
+end;
+
+function TMyPageEdit.LoadFileAsBinFrom(PathFileName: String; PageName: String): TMyRichEdit;
+begin
+  Result := GetEdit(PageName);
+  if Result <> nil then
+  begin
+    Result.LoadAsBinFrom(PathFileName);
   end;
 end;
 

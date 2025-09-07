@@ -3,16 +3,21 @@
 interface
 
 uses
-  System.SysUtils, System.StrUtils, Winapi.Windows, Winapi.Messages, Winapi.WinInet, System.Classes, Vcl.Graphics, Vcl.Controls,
-  Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.ClipBrd,
-  Vcl.ToolWin, Vcl.ActnList, System.Actions, System.ImageList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
-  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes,
+  System.UITypes, System.IOUtils, System.Math, System.Win.ComObj, System.SysUtils, System.StrUtils, System.Classes,
+  System.Actions, System.ImageList, System.SyncObjs,
 
-  System.SyncObjs,
-  IniFiles,
-  OcComPortObj,
+  Winapi.RichEdit, Winapi.ShellAPI, Winapi.ShlObj, Winapi.ActiveX, Winapi.Windows, Winapi.Messages, Winapi.WinInet,
+
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Menus,
+  Vcl.ClipBrd, Vcl.ToolWin, Vcl.ActnList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
+  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes,
+  Vcl.OleCtrls, SHDocVw,
+
   Vcl.MyPageEdit,
-  uOctopusFunction, Vcl.OleCtrls, SHDocVw;
+  IniFiles,
+  uOcComPortObj,
+
+  uOctopusFunction;
 
 type
   TMainOctopusDebuggingDevelopmentForm = class(TForm)
@@ -196,7 +201,6 @@ type
     ProblemFeedback1: TMenuItem;
     WelcomeAndHelp1: TMenuItem;
     ToolButton17: TToolButton;
-    ToolButton18: TToolButton;
     Encoding1: TMenuItem;
     ASCIIItem: TMenuItem;
     ANSIItem: TMenuItem;
@@ -437,6 +441,7 @@ type
     procedure UpdateUartToolBar();
     procedure UpdateMainMenu();
     procedure UpdateCommandObject();
+    procedure SwitchUartEditorToolBar(Component: TComponent);
 
     procedure StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
 
@@ -474,9 +479,8 @@ var
 
 implementation
 
-uses System.UITypes, System.IOUtils, System.Math, System.Win.ComObj, Winapi.RichEdit, Winapi.ShellAPI, Winapi.ShlObj, Winapi.ActiveX,
-  uSetting, OcProtocol, CPort, uMainSetting, uSMTP, uEncryptionDecryption, uCRC,
-  Screenshot, uScreenMain, uCommand, uDownloader, uDownloadsManager, uPageSetup, uOctopusAbout,
+uses CPort, uOcProtocol, uUsartSetting, uSMTP, uEncryptionDecryption, uCRC,
+  uScreenshot, uScreenMain, uCommand, uDownloader, uDownloadsManager, uPageSetup, uOctopusAbout,
   uMergeBin;
 
 resourcestring
@@ -704,7 +708,11 @@ begin
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormShow(Sender: TObject);
+var
+  Component: TComponent;
 begin
+  Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
+
   AcceptCommandLine();
   if SV_R.Opened then
   begin
@@ -716,6 +724,12 @@ begin
   end;
   DragAcceptFiles(Handle, true);
 
+  SwitchUartEditorToolBar(Component);
+
+  if SettingPagesDlg.CheckBox2.Checked then
+    Self.FormStyle := TFormStyle.fsStayOnTop
+  else
+    Self.FormStyle := TFormStyle.fsNormal;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -1075,6 +1089,7 @@ begin
 
   UpdateCommandObject();
   UpdateUartToolBar();
+  SwitchUartEditorToolBar(Component);
   StatusBarPrintFileSize();
 end;
 
@@ -1103,7 +1118,7 @@ begin
     exit;
   CMyRichEdit.StyleElements := [seClient, seBorder];
   LoadUntitledContent(CMyRichEdit);
-
+  SwitchUartEditorToolBar(CMyRichEdit);
   /// SetPathFileName(sUntitled);
   /// CMyRichEdit.Clear();
   /// CMyRichEdit.Modified := false;
@@ -1152,7 +1167,11 @@ begin
   NewPageName := PageControl1.GetActivePageName;
   if NewPageName = sUntitled then
   begin
+    // if IsBinaryFile(PathFileName) then
+    // MyRichEdit := PageControl1.LoadFileAsBinFrom(PathFileName, sUntitled)
+    // else
     MyRichEdit := PageControl1.LoadFileFrom(PathFileName, sUntitled);
+
     if MyRichEdit <> nil then
     begin
       MyRichEdit.ReadOnly := ofReadOnly in FileOpenCmd.Dialog.Options;
@@ -2338,6 +2357,11 @@ begin
   Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
   SynchroSetMyRichEditFont(Component);
   SettingPagesDlg.UpdateLaunguage(Self);
+
+  if SettingPagesDlg.CheckBox2.Checked then
+    Self.FormStyle := TFormStyle.fsStayOnTop
+  else
+    Self.FormStyle := TFormStyle.fsNormal;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem2Click(Sender: TObject);
@@ -2542,9 +2566,13 @@ begin
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ToolButton13Click(Sender: TObject);
+var
+  Component: TComponent;
 begin
   GetAndRemoveDevices(Self.GetCurrentPageName());
   UpdateUartToolBar();
+  Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  SwitchUartEditorToolBar(Component);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ToolButton16Click(Sender: TObject);
@@ -2659,6 +2687,28 @@ begin
     RichEditTransparentItem.Checked := CMyRichEdit.Transparent;
     RichEditWordWrapItem.Checked := CMyRichEdit.ScrollBars = ssVertical;
     CMyRichEdit.WordWrap := RichEditWordWrapItem.Checked;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SwitchUartEditorToolBar(Component: TComponent);
+begin
+  if Component is TMyMemo then
+  begin
+    StandardToolBar2.Visible := true;
+    FormatToolBarMenuItem2.Checked := StandardToolBar2.Visible;
+
+    StandardToolBar1.Visible := false;
+    FormatToolBarMenuItem1.Checked := StandardToolBar1.Visible;
+    TMyRichEdit(Component).SetFocus;
+  end;
+  if Component is TMyRichEdit then
+  begin
+    StandardToolBar1.Visible := true;
+    FormatToolBarMenuItem1.Checked := StandardToolBar1.Visible;
+
+    StandardToolBar2.Visible := false;
+    FormatToolBarMenuItem2.Checked := StandardToolBar2.Visible;
+    TMyRichEdit(Component).SetFocus;
   end;
 end;
 
@@ -3122,21 +3172,21 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.GetAndRemoveDevices(DeviceName: String);
 var
-  OcComPortObj: TOcComPortObj;
+  // OcComPortObj: TOcComPortObj;
   ActivePageIndex: Integer;
 begin
-  OcComPortObj := SettingPagesDlg.GetDeciceByFullName(DeviceName);
-  if OcComPortObj <> nil then
-  begin
-    SettingPagesDlg.closeDevice(DeviceName);
-  end;
+  // OcComPortObj := SettingPagesDlg.GetDeciceByFullName(DeviceName);
+  // if OcComPortObj <> nil then
+  // begin
+  SettingPagesDlg.closeDevice(DeviceName);
+  // end;
   ActivePageIndex := PageControl1.ActivePageIndex;
   PageControl1.DeletePage(DeviceName);
   ActivePageIndex := Max(0, PageControl1.PageCount - 1);
-  PageControl1.ActivePageIndex := ActivePageIndex;
   CMyRichEdit := nil;
   SetPathFileName('');
   UpdateStatus('', 2);
+  PageControl1.ActivePageIndex := ActivePageIndex;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(DeviceName: String; AutoOpen: Boolean = true);
@@ -3199,9 +3249,8 @@ begin
 
     ShowStartComments(OcComPortObj);
     SynchroSetMyRichEditFont(MyRichEdit);
-
     OcComPortObj.SaveLog(SettingPagesDlg.OctopusCfgDir_LogFilePath);
-    if i >= 5 then
+    if i >= 2 then
       break;
   end;
 end;
@@ -3386,7 +3435,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.ShowStartComments(OcComPortObj: T
 begin
   OcComPortObj.DebugLog('#############################################################################');
   // OcComPortObj.DebugLog(APPLICATION_TITLE + FVersionNumberStr);
-  OcComPortObj.DebugLog('Octopus Serial Port Development & Debugging Assistant ' + FVersionNumberStr);
+  OcComPortObj.DebugLog('Octopus Usart Development and Debugging Assistant ' + FVersionNumberStr);
   OcComPortObj.DebugLog('Home Page: ' + OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 + ' ');
   OcComPortObj.DebugLog('#############################################################################');
   OcComPortObj.DebugLog('' + OcComPortObj.ComPortFullName + ' ');

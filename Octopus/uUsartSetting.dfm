@@ -3,8 +3,8 @@ object SettingPagesDlg: TSettingPagesDlg
   Top = 108
   BorderStyle = bsDialog
   Caption = 'Octopus Option Settings '
-  ClientHeight = 636
-  ClientWidth = 1100
+  ClientHeight = 640
+  ClientWidth = 1090
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -20,8 +20,8 @@ object SettingPagesDlg: TSettingPagesDlg
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 1100
-    Height = 590
+    Width = 1090
+    Height = 594
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
@@ -31,27 +31,27 @@ object SettingPagesDlg: TSettingPagesDlg
       AlignWithMargins = True
       Left = 8
       Top = 8
-      Width = 1084
-      Height = 574
+      Width = 1074
+      Height = 578
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = 'Serial Port Settings'
         object Panel6: TPanel
-          Left = 326
+          Left = 316
           Top = 0
           Width = 750
-          Height = 542
+          Height = 546
           Align = alRight
           BevelOuter = bvNone
           TabOrder = 0
           object Panel11: TPanel
             AlignWithMargins = True
             Left = 5
-            Top = 312
+            Top = 323
             Width = 740
-            Height = 228
+            Height = 217
             Margins.Left = 5
             Margins.Top = 2
             Margins.Right = 5
@@ -59,28 +59,28 @@ object SettingPagesDlg: TSettingPagesDlg
             TabOrder = 0
             object Label112: TLabel
               Left = 8
-              Top = 44
+              Top = 50
               Width = 109
               Height = 17
               Caption = 'Back ground Color'
             end
             object Label113: TLabel
               Left = 8
-              Top = 76
+              Top = 82
               Width = 108
               Height = 17
               Caption = 'Content Text Color'
             end
             object Label114: TLabel
               Left = 8
-              Top = 12
+              Top = 18
               Width = 77
               Height = 17
               Caption = 'UI Language '
             end
             object Button5: TButton
               Left = 8
-              Top = 152
+              Top = 166
               Width = 356
               Height = 34
               Caption = 'Clear internal cache '
@@ -89,7 +89,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object Button4: TButton
               Left = 8
-              Top = 112
+              Top = 118
               Width = 356
               Height = 34
               Caption = 'Open the log and the profile directory '
@@ -98,7 +98,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object Button6: TButton
               Left = 416
-              Top = 112
+              Top = 118
               Width = 297
               Height = 34
               Caption = 'Repair or create the desktop shortcut '
@@ -107,7 +107,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object ColorBoxContentBG: TColorBox
               Left = 123
-              Top = 40
+              Top = 46
               Width = 241
               Height = 22
               Selected = clWindow
@@ -116,7 +116,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object ColorBoxText: TColorBox
               Left = 123
-              Top = 73
+              Top = 79
               Width = 241
               Height = 22
               DefaultColorColor = clWhite
@@ -126,7 +126,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object ComboBox8: TComboBox
               Left = 123
-              Top = 8
+              Top = 14
               Width = 241
               Height = 25
               Style = csDropDownList
@@ -140,7 +140,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object CheckBoxShortcutForExplorer: TCheckBox
               Left = 416
-              Top = 8
+              Top = 14
               Width = 305
               Height = 17
               Caption = 'Add a shortcut menu in System Explorer'
@@ -150,7 +150,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object CheckBoxDesktopShortcutMenu: TCheckBox
               Left = 416
-              Top = 44
+              Top = 50
               Width = 265
               Height = 17
               Caption = 'Add a shotcut menu item on desktop '
@@ -160,7 +160,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object Button7: TButton
               Left = 416
-              Top = 152
+              Top = 166
               Width = 297
               Height = 34
               Caption = 'Generate the language translation files '
@@ -298,7 +298,7 @@ object SettingPagesDlg: TSettingPagesDlg
             Left = 5
             Top = 174
             Width = 740
-            Height = 133
+            Height = 144
             Margins.Left = 5
             Margins.Top = 2
             Margins.Right = 5
@@ -352,7 +352,7 @@ object SettingPagesDlg: TSettingPagesDlg
           Left = 0
           Top = 0
           Width = 320
-          Height = 542
+          Height = 546
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 1
@@ -626,8 +626,8 @@ object SettingPagesDlg: TSettingPagesDlg
   end
   object Panel2: TPanel
     Left = 0
-    Top = 590
-    Width = 1100
+    Top = 594
+    Width = 1090
     Height = 46
     Align = alBottom
     BevelOuter = bvNone
