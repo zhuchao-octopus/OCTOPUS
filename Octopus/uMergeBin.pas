@@ -63,7 +63,9 @@ type
     App1Info, App2Info: TFlashBankInfo;
     procedure MergeBinFiles(const BinAPath, BinBPath, OutputPath: string; OffsetB: Integer);
     procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
-    procedure updateComboBoxList();
+    procedure UpdateComboBoxList();
+    procedure GetMagiecNumberName(MagicNumber: UInt32; out MagicName: String);
+
   public
     { Public declarations }
     OcComPortObj: TOcComPortObj;
@@ -157,7 +159,7 @@ begin
   end;
 end;
 
-procedure TMergeBinFrm.updateComboBoxList();
+procedure TMergeBinFrm.UpdateComboBoxList();
 var
   FilePath: string;
   SL: TStringList;
@@ -188,6 +190,26 @@ begin
   end;
 end;
 
+procedure TMergeBinFrm.GetMagiecNumberName(MagicNumber: UInt32; out MagicName: String);
+var
+  i: Integer;
+  name: String;
+  data: TBytes;
+  MagicCrc: UInt32;
+begin
+  for i := 0 to ComboBox1.Items.Count - 1 do
+  begin
+    name := ComboBox1.Items[i];
+    data := TEncoding.ASCII.GetBytes(Trim(ComboBox1.Text)); // 或 UTF8，根据需要
+    MagicCrc := CalculateCRC32(data, Length(data));
+    if MagicCrc = MagicNumber then
+    begin
+      MagicName := name;
+      break;
+    end;
+  end;
+end;
+
 procedure TMergeBinFrm.Button1Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
@@ -204,10 +226,10 @@ procedure TMergeBinFrm.Button4Click(Sender: TObject);
 begin
   if SaveDialog1.Execute then
   begin
-    if not AnsiStartsText('MCUAB_', ExtractFileName(SaveDialog1.FileName)) then
-      LabeledEdit3.Text := IncludeTrailingPathDelimiter(ExtractFilePath(SaveDialog1.FileName)) + 'MCUAB_' + ExtractFileName(SaveDialog1.FileName)
-    else
-      LabeledEdit3.Text := SaveDialog1.FileName;
+    // if not AnsiStartsText('MCUAB_', ExtractFileName(SaveDialog1.FileName)) then
+    // LabeledEdit3.Text := IncludeTrailingPathDelimiter(ExtractFilePath(SaveDialog1.FileName)) + 'MCUAB_' + ExtractFileName(SaveDialog1.FileName)
+    // else
+    LabeledEdit3.Text := SaveDialog1.FileName;
   end;
 end;
 
@@ -227,6 +249,7 @@ var
   FileStream: TFileStream;
   Meta: TMetaInfo;
   MetaPos: Int64;
+  MagicName: String;
 begin
   BinFileC := Trim(LabeledEdit3.Text);
 
@@ -255,16 +278,22 @@ begin
         Exit;
       end;
 
+      GetMagiecNumberName(Meta.bank1.BankMagic, MagicName);
       Memo1.Lines.Add('');
+      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Name ', MagicName]));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Magic', '0x' + IntToHex(Meta.bank1.BankMagic, 8)]));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Start Address', '0x' + IntToHex(Meta.bank1.BankAddress, 8)]));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Size', IntToStr(Meta.bank1.BankSize) + ' bytes']));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App1 CRC32', '0x' + IntToHex(Meta.bank1.BankCRC32, 8)]));
+
+      GetMagiecNumberName(Meta.bank2.BankMagic, MagicName);
       Memo1.Lines.Add('');
+      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Name ', MagicName]));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App2 Magic', '0x' + IntToHex(Meta.bank2.BankMagic, 8)]));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App2 Start Address', '0x' + IntToHex(Meta.bank2.BankAddress, 8)]));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App2 Size', IntToStr(Meta.bank2.BankSize) + ' bytes']));
       Memo1.Lines.Add(Format(FIELD_FMT, ['App2 CRC32', '0x' + IntToHex(Meta.bank2.BankCRC32, 8)]));
+
       Memo1.Lines.Add('');
     finally
       FileStream.Free;
@@ -303,14 +332,14 @@ end;
 
 procedure TMergeBinFrm.Button9Click(Sender: TObject);
 var
-  //OcComPortObj: TOcComPortObj;
+  // OcComPortObj: TOcComPortObj;
   FileStream: TFileStream;
   FileNameLoaded: String;
 begin
   /// GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
   begin
-    //OcComPortObj.Log('No device is found,please open a device.');
+    // OcComPortObj.Log('No device is found,please open a device.');
     MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     Exit;
   end;
@@ -349,12 +378,12 @@ end;
 
 procedure TMergeBinFrm.ComboBox1DropDown(Sender: TObject);
 begin
-  updateComboBoxList();
+  UpdateComboBoxList();
 end;
 
 procedure TMergeBinFrm.FormShow(Sender: TObject);
 begin
-  updateComboBoxList();
+  UpdateComboBoxList();
 end;
 
 procedure TMergeBinFrm.Button3Click(Sender: TObject);
@@ -380,8 +409,8 @@ begin
 
   if not FileExists(BinFileB) then
   begin
-    Memo1.Lines.Add('BIN 文件 B 不存在: ' + BinFileB);
-    Exit;
+    // Memo1.Lines.Add('BIN 文件 B 不存在: ' + BinFileB);
+    // Exit;
   end;
 
   if BinFileC = '' then
@@ -416,10 +445,17 @@ begin
 
   // 获取文件大小
   FileAStream := TFileStream.Create(BinFileA, fmOpenRead or fmShareDenyWrite);
-  FileBStream := TFileStream.Create(BinFileB, fmOpenRead or fmShareDenyWrite);
+  if FileExists(BinFileB) then
+    FileBStream := TFileStream.Create(BinFileB, fmOpenRead or fmShareDenyWrite)
+  else
+    FileBStream := nil;
+
   try
     SizeA := FileAStream.Size;
-    SizeB := FileBStream.Size;
+    if (FileBStream <> nil) then
+      SizeB := FileBStream.Size
+    else
+      SizeB := 0;
 
     // 冲突检查
     if OffsetB < SizeA then
@@ -477,12 +513,16 @@ var
   App1Size, App2Size: Integer;
   CRC1, CRC2: UInt32;
   App1Data, App2Data: TBytes;
-  MagicNumber: Integer;
+  ModdelMagicNumber: Integer;
   Meta: TMetaInfo;
   data: TBytes;
 begin
   FileA := TFileStream.Create(BinAPath, fmOpenRead or fmShareDenyWrite);
-  FileB := TFileStream.Create(BinBPath, fmOpenRead or fmShareDenyWrite);
+  if FileExists(BinBPath) then
+    FileB := TFileStream.Create(BinBPath, fmOpenRead or fmShareDenyWrite)
+  else
+    FileB := nil;
+
   FileOut := TFileStream.Create(OutputPath, fmCreate);
 
   try
@@ -509,20 +549,28 @@ begin
     end;
 
     // Step 4: Read entire BIN B and compute info
-    SetLength(App2Data, FileB.Size);
-    FileB.ReadBuffer(App2Data[0], FileB.Size);
-    App2Size := Length(App2Data);
-    CRC2 := CalculateCRC32(App2Data, App2Size);
-
-    // Step 5: Write BIN B to output
-    FileOut.WriteBuffer(App2Data[0], App2Size);
+    if FileB <> nil then
+    begin
+      SetLength(App2Data, FileB.Size);
+      FileB.ReadBuffer(App2Data[0], FileB.Size);
+      App2Size := Length(App2Data);
+      CRC2 := CalculateCRC32(App2Data, App2Size);
+      // Step 5: Write BIN B to output
+      FileOut.WriteBuffer(App2Data[0], App2Size);
+    end
+    else
+    begin
+      SetLength(App2Data, 0);
+      App2Size := 0;
+      CRC2 := 0;
+    end;
 
     // Step 6: Create and append metadata
     // MagicNumber := FNV1aHash32(Trim(ComboBox1.Text));
     data := TEncoding.ASCII.GetBytes(Trim(ComboBox1.Text)); // 或 UTF8，根据需要
-    MagicNumber := CalculateCRC32(data, Length(data));
-    App1Info := MakeAppInfo(MagicNumber, 0, App1Size, CRC1);
-    App2Info := MakeAppInfo(MagicNumber, OffsetB, App2Size, CRC2);
+    ModdelMagicNumber := CalculateCRC32(data, Length(data));
+    App1Info := MakeAppInfo(ModdelMagicNumber, 0, App1Size, CRC1);
+    App2Info := MakeAppInfo(ModdelMagicNumber, OffsetB, App2Size, CRC2);
 
     Meta.bank1 := App1Info;
     Meta.bank2 := App2Info;
@@ -530,7 +578,8 @@ begin
 
   finally
     FileA.Free;
-    FileB.Free;
+    if FileB <> nil then
+      FileB.Free;
     FileOut.Free;
   end;
 end;

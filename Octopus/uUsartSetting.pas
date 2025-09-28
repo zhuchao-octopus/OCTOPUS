@@ -991,11 +991,13 @@ begin
     Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox36.Name), CheckBox36.Checked);
     Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckboxProcessDataBackground.Name), CheckboxProcessDataBackground.Checked);
 
-    Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
-    Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
-    Octopusini.WriteInteger('Configuration', 'CONTENT_FONTCOLOR', ColorBoxText.Selected);
-    Octopusini.WriteInteger('Configuration', 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
+    Octopusini.WriteString(OcComPortObj.ComPortFullName, 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
+    Octopusini.WriteInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
+    Octopusini.WriteInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTCOLOR', ColorBoxText.Selected);
+    Octopusini.WriteInteger(OcComPortObj.ComPortFullName, 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
+
     /// Octopusini.WriteInteger('Configuration', 'CONTENT_TEXTCOLOR', ColorBoxText.Selected);
+    Octopusini.WriteBool('Configuration', getObjectID(CheckBox2.Name), CheckBox2.Checked);
   finally
     Octopusini.Free;
   end;
@@ -1022,6 +1024,9 @@ begin
 
   try
     Octopusini := TIniFile.Create(s);
+
+    CheckBox2.Checked := Octopusini.ReadBool('Configuration', getObjectID(CheckBox2.Name), false);
+
     CheckBox33.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox33.Name), false);
     CheckBox34.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox34.Name), false);
     CheckBox35.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox35.Name), false);
@@ -1398,7 +1403,7 @@ var
 const
   KeyName = 'OctopusSoftware'; // ¹Ì¶¨ Key Ãû³Æ
 begin
-  //fileName := ChangeFileExt(ExtractFileName(PathFileName), '');
+  // fileName := ChangeFileExt(ExtractFileName(PathFileName), '');
   Reg := TRegistry.Create;
   try
     Reg.RootKey := HKEY_CURRENT_USER;
