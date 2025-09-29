@@ -3,8 +3,8 @@ object MergeBinFrm: TMergeBinFrm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Merging Bin File'
-  ClientHeight = 685
-  ClientWidth = 943
+  ClientHeight = 721
+  ClientWidth = 945
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,14 +18,14 @@ object MergeBinFrm: TMergeBinFrm
     Left = 8
     Top = 8
     Width = 927
-    Height = 665
+    Height = 705
     ActivePage = TabSheet1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Merging Bin File'
       object Button1: TButton
         Left = 836
-        Top = 31
+        Top = 71
         Width = 75
         Height = 30
         Caption = '...'
@@ -34,7 +34,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object Button2: TButton
         Left = 836
-        Top = 77
+        Top = 117
         Width = 75
         Height = 30
         Caption = '...'
@@ -43,7 +43,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object Button4: TButton
         Left = 836
-        Top = 127
+        Top = 167
         Width = 75
         Height = 30
         Caption = '...'
@@ -70,7 +70,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object Button9: TButton
         Left = 13
-        Top = 598
+        Top = 638
         Width = 898
         Height = 30
         Caption = 'Start Upgrading'
@@ -79,7 +79,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object ProgressBar1: TProgressBar
         Left = 13
-        Top = 565
+        Top = 597
         Width = 898
         Height = 28
         Step = 1
@@ -87,7 +87,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object Memo1: TMemo
         Left = 13
-        Top = 272
+        Top = 312
         Width = 809
         Height = 281
         Font.Charset = DEFAULT_CHARSET
@@ -101,7 +101,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object Button7: TButton
         Left = 648
-        Top = 224
+        Top = 264
         Width = 174
         Height = 30
         Caption = 'Read The Meta Infor'
@@ -110,7 +110,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object Button3: TButton
         Left = 13
-        Top = 224
+        Top = 264
         Width = 617
         Height = 30
         Caption = 'Start Merging The Bin Files'
@@ -119,7 +119,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object ComboBox1: TComboBox
         Left = 432
-        Top = 176
+        Top = 216
         Width = 390
         Height = 25
         Style = csDropDownList
@@ -128,17 +128,17 @@ object MergeBinFrm: TMergeBinFrm
       end
       object Button8: TButton
         Left = 343
-        Top = 174
+        Top = 214
         Width = 75
         Height = 30
         Caption = 'Update'
         TabOrder = 11
         OnClick = Button8Click
       end
-      object LabeledEdit4: TLabeledEdit
-        Left = 13
-        Top = 176
-        Width = 324
+      object LabeledEditB: TLabeledEdit
+        Left = 189
+        Top = 216
+        Width = 140
         Height = 25
         EditLabel.Width = 67
         EditLabel.Height = 17
@@ -148,7 +148,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object LabeledEdit3: TLabeledEdit
         Left = 13
-        Top = 128
+        Top = 168
         Width = 809
         Height = 25
         EditLabel.Width = 70
@@ -159,7 +159,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object LabeledEdit1: TLabeledEdit
         Left = 13
-        Top = 32
+        Top = 73
         Width = 809
         Height = 25
         EditLabel.Width = 52
@@ -170,7 +170,7 @@ object MergeBinFrm: TMergeBinFrm
       end
       object LabeledEdit2: TLabeledEdit
         Left = 13
-        Top = 78
+        Top = 118
         Width = 809
         Height = 25
         EditLabel.Width = 51
@@ -178,6 +178,37 @@ object MergeBinFrm: TMergeBinFrm
         EditLabel.Caption = 'Bin File B'
         TabOrder = 15
         Text = ''
+      end
+      object LabeledEdit5: TLabeledEdit
+        Left = 13
+        Top = 27
+        Width = 809
+        Height = 25
+        EditLabel.Width = 72
+        EditLabel.Height = 17
+        EditLabel.Caption = 'Boot Loader'
+        TabOrder = 16
+        Text = ''
+      end
+      object Button10: TButton
+        Left = 836
+        Top = 24
+        Width = 75
+        Height = 30
+        Caption = '...'
+        TabOrder = 17
+        OnClick = Button10Click
+      end
+      object LabeledEditA: TLabeledEdit
+        Left = 13
+        Top = 216
+        Width = 156
+        Height = 25
+        EditLabel.Width = 66
+        EditLabel.Height = 17
+        EditLabel.Caption = 'L/A OFFSET'
+        TabOrder = 18
+        Text = '0x00010000'
       end
     end
   end
