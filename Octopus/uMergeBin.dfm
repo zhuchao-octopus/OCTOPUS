@@ -23,50 +23,50 @@ object MergeBinFrm: TMergeBinFrm
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Merging Bin File'
-      object Button1: TButton
+      object Button02: TButton
         Left = 836
         Top = 71
         Width = 75
         Height = 30
         Caption = '...'
         TabOrder = 0
-        OnClick = Button1Click
+        OnClick = Button02Click
       end
-      object Button2: TButton
+      object Button03: TButton
         Left = 836
         Top = 117
         Width = 75
         Height = 30
         Caption = '...'
         TabOrder = 1
-        OnClick = Button2Click
+        OnClick = Button03Click
       end
-      object Button4: TButton
+      object Button04: TButton
         Left = 836
         Top = 167
         Width = 75
         Height = 30
         Caption = '...'
         TabOrder = 2
-        OnClick = Button4Click
+        OnClick = Button04Click
       end
-      object Button6: TButton
+      object Button05: TButton
         Left = 836
         Top = 472
         Width = 75
         Height = 30
         Caption = 'Clear'
         TabOrder = 3
-        OnClick = Button6Click
+        OnClick = Button05Click
       end
-      object Button5: TButton
+      object Button06: TButton
         Left = 836
         Top = 523
         Width = 75
         Height = 30
         Caption = 'Exit'
         TabOrder = 4
-        OnClick = Button5Click
+        OnClick = Button06Click
       end
       object Button9: TButton
         Left = 13
@@ -99,41 +99,41 @@ object MergeBinFrm: TMergeBinFrm
         ScrollBars = ssBoth
         TabOrder = 7
       end
-      object Button7: TButton
+      object Button09: TButton
         Left = 648
         Top = 264
         Width = 174
         Height = 30
         Caption = 'Read The Meta Infor'
         TabOrder = 8
-        OnClick = Button7Click
+        OnClick = Button09Click
       end
-      object Button3: TButton
+      object Button08: TButton
         Left = 13
         Top = 264
         Width = 617
         Height = 30
         Caption = 'Start Merging The Bin Files'
         TabOrder = 9
-        OnClick = Button3Click
+        OnClick = Button08Click
       end
-      object ComboBox1: TComboBox
+      object ComboBox01: TComboBox
         Left = 432
         Top = 216
         Width = 390
         Height = 25
         Style = csDropDownList
         TabOrder = 10
-        OnDropDown = ComboBox1DropDown
+        OnDropDown = ComboBox01DropDown
       end
-      object Button8: TButton
+      object Button07: TButton
         Left = 343
         Top = 214
         Width = 75
         Height = 30
         Caption = 'Update'
         TabOrder = 11
-        OnClick = Button8Click
+        OnClick = Button07Click
       end
       object LabeledEditB: TLabeledEdit
         Left = 189
@@ -146,7 +146,7 @@ object MergeBinFrm: TMergeBinFrm
         TabOrder = 12
         Text = '0x00010000'
       end
-      object LabeledEdit3: TLabeledEdit
+      object LabeledEdit04: TLabeledEdit
         Left = 13
         Top = 168
         Width = 809
@@ -157,7 +157,7 @@ object MergeBinFrm: TMergeBinFrm
         TabOrder = 13
         Text = ''
       end
-      object LabeledEdit1: TLabeledEdit
+      object LabeledEdit02: TLabeledEdit
         Left = 13
         Top = 73
         Width = 809
@@ -168,7 +168,7 @@ object MergeBinFrm: TMergeBinFrm
         TabOrder = 14
         Text = ''
       end
-      object LabeledEdit2: TLabeledEdit
+      object LabeledEdit03: TLabeledEdit
         Left = 13
         Top = 118
         Width = 809
@@ -179,7 +179,7 @@ object MergeBinFrm: TMergeBinFrm
         TabOrder = 15
         Text = ''
       end
-      object LabeledEdit5: TLabeledEdit
+      object LabeledEdit01: TLabeledEdit
         Left = 13
         Top = 27
         Width = 809
@@ -190,14 +190,14 @@ object MergeBinFrm: TMergeBinFrm
         TabOrder = 16
         Text = ''
       end
-      object Button10: TButton
+      object Button01: TButton
         Left = 836
         Top = 24
         Width = 75
         Height = 30
         Caption = '...'
         TabOrder = 17
-        OnClick = Button10Click
+        OnClick = Button01Click
       end
       object LabeledEditA: TLabeledEdit
         Left = 13

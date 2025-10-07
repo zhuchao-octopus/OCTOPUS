@@ -32,45 +32,44 @@ type
     OpenDialog1: TOpenDialog;
     PageControl1: TPageControl;
     TabSheet1: TTabSheet;
-    Button1: TButton;
-    Button2: TButton;
-    Button4: TButton;
-    Button6: TButton;
-    Button5: TButton;
+    Button02: TButton;
+    Button03: TButton;
+    Button04: TButton;
+    Button05: TButton;
+    Button06: TButton;
     Button9: TButton;
     ProgressBar1: TProgressBar;
     Memo1: TMemo;
-    Button7: TButton;
-    Button3: TButton;
-    ComboBox1: TComboBox;
-    Button8: TButton;
+    Button09: TButton;
+    Button08: TButton;
+    ComboBox01: TComboBox;
+    Button07: TButton;
     LabeledEditB: TLabeledEdit;
-    LabeledEdit3: TLabeledEdit;
-    LabeledEdit1: TLabeledEdit;
-    LabeledEdit2: TLabeledEdit;
-    LabeledEdit5: TLabeledEdit;
-    Button10: TButton;
+    LabeledEdit04: TLabeledEdit;
+    LabeledEdit02: TLabeledEdit;
+    LabeledEdit03: TLabeledEdit;
+    LabeledEdit01: TLabeledEdit;
+    Button01: TButton;
     LabeledEditA: TLabeledEdit;
-    procedure Button4Click(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
-    procedure Button7Click(Sender: TObject);
-    procedure ComboBox1DropDown(Sender: TObject);
+    procedure Button04Click(Sender: TObject);
+    procedure Button02Click(Sender: TObject);
+    procedure Button03Click(Sender: TObject);
+    procedure Button08Click(Sender: TObject);
+    procedure Button06Click(Sender: TObject);
+    procedure Button05Click(Sender: TObject);
+    procedure Button09Click(Sender: TObject);
+    procedure ComboBox01DropDown(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Button8Click(Sender: TObject);
+    procedure Button07Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
-    procedure Button10Click(Sender: TObject);
+    procedure Button01Click(Sender: TObject);
   private
     { Private declarations }
-    App0Info, App1Info, App2Info: TFlashBankInfo;
-    procedure MergeBinFiles(const BinLPath, BinAPath, BinBPath, OutputPath: string; OffsetA, OffsetB: Integer);
+    function MergeBinFiles(const BinLPath, BinAPath, BinBPath, OutputPath: string; OffsetA, OffsetB: Integer): TMetaInfo;
+    function GetMagiecNumberName(MagicNumber: UInt32): String;
     procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
     procedure UpdateComboBoxList();
-    procedure GetMagiecNumberName(MagicNumber: UInt32; out MagicName: String);
-
+    procedure LogAppInfo(const AppName: string; const Info: TFlashBankInfo);
   public
     { Public declarations }
     OcComPortObj: TOcComPortObj;
@@ -88,6 +87,73 @@ implementation
 uses uOcProtocol, uCRC;
 
 {$R *.dfm}
+
+function GetMergeFilesOutputFileName(const FileL, FileA, FileB: string): string;
+var
+  Dir, Timestamp, BaseName, Ext: string;
+  // Index: Integer;
+begin
+  // 使用 FileL 的目录作为输出目录
+  Dir := ExtractFilePath(FileL);
+  Ext := '_';
+  // 生成时间戳
+  Timestamp := FormatDateTime('yyyymmddhhnnss', Now);
+  if FileL <> '' then
+  begin
+    Ext := Ext + 'l';
+    Dir := ExtractFilePath(FileL);
+  end
+  else
+  begin
+    Ext := Ext + 'x';
+  end;
+
+  if FileA <> '' then
+  begin
+    Ext := Ext + 'a';
+    Dir := ExtractFilePath(FileA);
+  end
+  else
+  begin
+    Ext := Ext + 'ax';
+  end;
+
+  if FileB <> '' then
+  begin
+    Ext := Ext + 'b';
+    Dir := ExtractFilePath(FileB);
+  end
+  else
+  begin
+    Ext := Ext + 'x';
+  end;
+  // 构建基本文件名
+  BaseName := 'MCU_' + Timestamp + Ext; // 默认编号001，可以根据需要做自动递增
+
+  // 拼接完整路径并使用 oupg 扩展名
+  Result := IncludeTrailingPathDelimiter(Dir) + BaseName + '.oupg';
+end;
+
+procedure PaddingFile(FileOut: TFileStream; PaddingSize: Integer);
+var
+  Buffer: array [0 .. 8191] of Byte; // 8KB 缓冲
+  WriteSize: Integer;
+begin
+  if PaddingSize <= 0 then
+  begin
+    MergeBinFrm.Memo1.Lines.Add(Format('Warning: Desired offset 0x%.8X < current position 0x%.8X. Padding skipped.', [PaddingSize, FileOut.Position]));
+    Exit;
+  end;
+
+  FillChar(Buffer, SizeOf(Buffer), $FF);
+
+  while PaddingSize > 0 do
+  begin
+    WriteSize := Min(PaddingSize, SizeOf(Buffer));
+    FileOut.Write(Buffer[0], WriteSize);
+    Dec(PaddingSize, WriteSize);
+  end;
+end;
 
 function FNV1aHash32(const S: string): Cardinal;
 const
@@ -115,13 +181,13 @@ begin
 end;
 
 // Create a TAppInfo record for given app
-function MakeAppInfo(BankMagic, Adress, AppSize, CRC32: UInt32): TFlashBankInfo;
+function MakeAppInfo(BankMagic, Address, AppSize, CRC32: UInt32): TFlashBankInfo;
 begin
   Result.BankMagic := APP_INFO_MAGIC;
   Result.BankModel := BankMagic;
   Result.BankSize := AppSize;
   Result.BankCRC32 := CRC32;
-  Result.BankAddress := Adress;
+  Result.BankAddress := Address;
 end;
 
 function FileSizeByName(const FileName: string): Integer;
@@ -145,7 +211,7 @@ begin
 
   if not FileExists(BinPath) then
   begin
-    ShowMessage('找不到 BIN 文件：' + BinPath);
+    // ShowMessage('找不到 BIN 文件：' + BinPath);
     Exit;
   end;
 
@@ -153,7 +219,7 @@ begin
   try
     if FS.Size < 8 then
     begin
-      ShowMessage('BIN 文件太小，无法读取向量表');
+      ShowMessage('无效的BIN文件(文件太小)，无法读取向量表!!!');
       Exit;
     end;
 
@@ -179,82 +245,87 @@ begin
     begin
       SL.LoadFromFile(FilePath, TEncoding.UTF8); // 如果是 ANSI 文件可省略第二个参数
 
-      ComboBox1.Items.BeginUpdate;
+      ComboBox01.Items.BeginUpdate;
       try
-        ComboBox1.Items.Assign(SL); // 加载所有行到 ComboBox
+        ComboBox01.Items.Assign(SL); // 加载所有行到 ComboBox
       finally
-        ComboBox1.Items.EndUpdate;
+        ComboBox01.Items.EndUpdate;
       end;
     end
     else
       Memo1.Lines.Add('未找到文件：' + FilePath);
   finally
     SL.Free;
-    if ComboBox1.ItemIndex = -1 then
-      ComboBox1.ItemIndex := 0;
+    if ComboBox01.ItemIndex = -1 then
+      ComboBox01.ItemIndex := 0;
   end;
 end;
 
-procedure TMergeBinFrm.GetMagiecNumberName(MagicNumber: UInt32; out MagicName: String);
+function TMergeBinFrm.GetMagiecNumberName(MagicNumber: UInt32): String;
 var
   i: Integer;
   name: String;
   data: TBytes;
   MagicCrc: UInt32;
 begin
-  for i := 0 to ComboBox1.Items.Count - 1 do
+  Result := '';
+  for i := 0 to ComboBox01.Items.Count - 1 do
   begin
-    name := ComboBox1.Items[i];
-    data := TEncoding.ASCII.GetBytes(Trim(ComboBox1.Text)); // 或 UTF8，根据需要
+    name := ComboBox01.Items[i];
+    data := TEncoding.ASCII.GetBytes(Trim(ComboBox01.Text)); // 或 UTF8，根据需要
     MagicCrc := CalculateCRC32(data, Length(data));
     if MagicCrc = MagicNumber then
     begin
-      MagicName := name;
+      Result := name;
       break;
     end;
   end;
 end;
 
-procedure TMergeBinFrm.Button10Click(Sender: TObject);
+procedure TMergeBinFrm.Button01Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
-    LabeledEdit5.Text := OpenDialog1.FileName;
+    LabeledEdit01.Text := OpenDialog1.FileName;
+  LabeledEdit04.Text := GetMergeFilesOutputFileName(LabeledEdit01.Text, LabeledEdit02.Text, LabeledEdit03.Text);
 end;
 
-procedure TMergeBinFrm.Button1Click(Sender: TObject);
+procedure TMergeBinFrm.Button02Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
-    LabeledEdit1.Text := OpenDialog1.FileName;
+    LabeledEdit02.Text := OpenDialog1.FileName;
+
+  LabeledEdit04.Text := GetMergeFilesOutputFileName(LabeledEdit01.Text, LabeledEdit02.Text, LabeledEdit03.Text);
 end;
 
-procedure TMergeBinFrm.Button2Click(Sender: TObject);
+procedure TMergeBinFrm.Button03Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
-    LabeledEdit2.Text := OpenDialog1.FileName;
+    LabeledEdit03.Text := OpenDialog1.FileName;
+  LabeledEdit04.Text := GetMergeFilesOutputFileName(LabeledEdit01.Text, LabeledEdit02.Text, LabeledEdit03.Text);
 end;
 
-procedure TMergeBinFrm.Button4Click(Sender: TObject);
+procedure TMergeBinFrm.Button04Click(Sender: TObject);
 begin
   if SaveDialog1.Execute then
   begin
     // if not AnsiStartsText('MCUAB_', ExtractFileName(SaveDialog1.FileName)) then
     // LabeledEdit3.Text := IncludeTrailingPathDelimiter(ExtractFilePath(SaveDialog1.FileName)) + 'MCUAB_' + ExtractFileName(SaveDialog1.FileName)
     // else
-    LabeledEdit3.Text := SaveDialog1.FileName;
+    LabeledEdit04.Text := SaveDialog1.FileName;
   end;
 end;
 
-procedure TMergeBinFrm.Button5Click(Sender: TObject);
+procedure TMergeBinFrm.Button06Click(Sender: TObject);
 begin
   close;
 end;
 
-procedure TMergeBinFrm.Button6Click(Sender: TObject);
+procedure TMergeBinFrm.Button05Click(Sender: TObject);
 begin
   Memo1.Clear;
 end;
 
-procedure TMergeBinFrm.Button7Click(Sender: TObject);
+procedure TMergeBinFrm.Button09Click(Sender: TObject);
 var
   BinFileC: string;
   FileStream: TFileStream;
@@ -262,7 +333,7 @@ var
   MetaPos: Int64;
   MagicName: String;
 begin
-  BinFileC := Trim(LabeledEdit3.Text);
+  BinFileC := Trim(LabeledEdit04.Text);
 
   if not FileExists(BinFileC) then
   begin
@@ -289,22 +360,9 @@ begin
         Exit;
       end;
 
-      GetMagiecNumberName(Meta.bank1.BankMagic, MagicName);
-      Memo1.Lines.Add('');
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Name ', MagicName]));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Magic', '0x' + IntToHex(Meta.bank1.BankMagic, 8)]));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Start Address', '0x' + IntToHex(Meta.bank1.BankAddress, 8)]));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Size', IntToStr(Meta.bank1.BankSize) + ' bytes']));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 CRC32', '0x' + IntToHex(Meta.bank1.BankCRC32, 8)]));
-
-      GetMagiecNumberName(Meta.bank2.BankMagic, MagicName);
-      Memo1.Lines.Add('');
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App1 Name ', MagicName]));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App2 Magic', '0x' + IntToHex(Meta.bank2.BankMagic, 8)]));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App2 Start Address', '0x' + IntToHex(Meta.bank2.BankAddress, 8)]));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App2 Size', IntToStr(Meta.bank2.BankSize) + ' bytes']));
-      Memo1.Lines.Add(Format(FIELD_FMT, ['App2 CRC32', '0x' + IntToHex(Meta.bank2.BankCRC32, 8)]));
-
+      LogAppInfo('App0', Meta.bank0);
+      LogAppInfo('App1', Meta.bank1);
+      LogAppInfo('App2', Meta.bank2);
       Memo1.Lines.Add('');
     finally
       FileStream.Free;
@@ -332,15 +390,15 @@ begin
   Result := Value and not(Alignment - 1);
 end;
 
-procedure TMergeBinFrm.Button8Click(Sender: TObject);
+procedure TMergeBinFrm.Button07Click(Sender: TObject);
 var
   LoadAddress, RealStartAddr, RealStartBddr: Integer;
 begin
-  GetBinFileOffset(Trim(LabeledEdit1.Text), RealStartAddr);
+  GetBinFileOffset(Trim(LabeledEdit02.Text), RealStartAddr);
   LoadAddress := AlignDown(RealStartAddr, 256);
   LabeledEditA.Text := '0x' + IntToHex(LoadAddress, 8);
 
-  GetBinFileOffset(Trim(LabeledEdit2.Text), RealStartBddr);
+  GetBinFileOffset(Trim(LabeledEdit03.Text), RealStartBddr);
   LoadAddress := AlignDown(RealStartBddr, 256);
   LabeledEditB.Text := '0x' + IntToHex(LoadAddress, 8);
 end;
@@ -366,7 +424,7 @@ begin
     Exit;
   end;
 
-  FileNameLoaded := Trim(LabeledEdit3.Text); // OpenDialog1.FileName;
+  FileNameLoaded := Trim(LabeledEdit04.Text); // OpenDialog1.FileName;
   if FileExists(FileNameLoaded) then
   begin
     FileStream := ReadFileToStream(FileNameLoaded);
@@ -391,7 +449,7 @@ begin
   SendFileAsBin(OcComPortObj, FileNameLoaded);
 end;
 
-procedure TMergeBinFrm.ComboBox1DropDown(Sender: TObject);
+procedure TMergeBinFrm.ComboBox01DropDown(Sender: TObject);
 begin
   UpdateComboBoxList();
 end;
@@ -401,30 +459,33 @@ begin
   UpdateComboBoxList();
 end;
 
-procedure TMergeBinFrm.Button3Click(Sender: TObject);
+procedure TMergeBinFrm.LogAppInfo(const AppName: string; const Info: TFlashBankInfo);
+var
+  model: String;
+begin
+  model := GetMagiecNumberName(Info.BankModel);
+  Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Magic', '0x' + IntToHex(Info.BankMagic, 8)]));
+  Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Model', '0x' + IntToHex(Info.BankModel, 8) + '(' + model + ')']));
+  Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Start Address', '0x' + IntToHex(Info.BankAddress, 8)]));
+  Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Size', IntToStr(Info.BankSize) + ' bytes']));
+  Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' CRC32', '0x' + IntToHex(Info.BankCRC32, 8)]));
+  Memo1.Lines.Add('');
+end;
+
+procedure TMergeBinFrm.Button08Click(Sender: TObject);
 var
   BinFileL, BinFileA, BinFileB, BinFileC: string;
   OffsetStrA, OffsetStrB: string;
   OffsetA, OffsetB: Integer;
   FileLStream, FileAStream, FileBStream: TFileStream;
-  SizeL, SizeA, SizeB: Int64;
-
-  procedure LogAppInfo(const AppName: string; const Info: TFlashBankInfo; StartAddr: Integer);
-  begin
-    Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Magic', '0x' + IntToHex(Info.BankMagic, 8)]));
-    Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Model', '0x' + IntToHex(Info.BankModel, 8)]));
-    Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Start Address', '0x' + IntToHex(StartAddr, 8)]));
-    Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' Size', IntToStr(Info.BankSize) + ' bytes']));
-    Memo1.Lines.Add(Format(FIELD_FMT, [AppName + ' CRC32', '0x' + IntToHex(Info.BankCRC32, 8)]));
-    Memo1.Lines.Add('');
-  end;
-
+  SizeL, SizeA, SizeB, SizeMatas: Int64;
+  MetaInfo: TMetaInfo;
 begin
   Memo1.Clear;
-  BinFileL := Trim(LabeledEdit5.Text);
-  BinFileA := Trim(LabeledEdit1.Text);
-  BinFileB := Trim(LabeledEdit2.Text);
-  BinFileC := Trim(LabeledEdit3.Text);
+  BinFileL := Trim(LabeledEdit01.Text);
+  BinFileA := Trim(LabeledEdit02.Text);
+  BinFileB := Trim(LabeledEdit03.Text);
+  BinFileC := Trim(LabeledEdit04.Text);
   OffsetStrA := Trim(LabeledEditA.Text);
   OffsetStrB := Trim(LabeledEditB.Text);
 
@@ -456,92 +517,92 @@ begin
   end;
 
   // 输入检查
-  if (BinFileA = '') or not FileExists(BinFileA) then
+  if (BinFileL <> '') and (not FileExists(BinFileL)) then
+    Memo1.Lines.Add('警告: BIN 文件 L 不存在: ' + BinFileL);
+
+  if (BinFileA = '') or (not FileExists(BinFileA)) then
   begin
-    Memo1.Lines.Add('BIN 文件 A 不存在: ' + BinFileA);
+    Memo1.Lines.Add('警告: BIN 文件 A 不存在: ' + BinFileA);
     Exit;
   end;
 
-  if (BinFileB <> '') and not FileExists(BinFileB) then
+  if (BinFileB <> '') and (not FileExists(BinFileB)) then
     Memo1.Lines.Add('警告: BIN 文件 B 不存在: ' + BinFileB);
-
-  if (BinFileL <> '') and not FileExists(BinFileL) then
-    Memo1.Lines.Add('警告: BIN 文件 L 不存在: ' + BinFileL);
 
   if BinFileC = '' then
   begin
-    Memo1.Lines.Add('请输入输出文件路径！');
+    Memo1.Lines.Add('警告: 请输入输出文件路径！');
     Exit;
   end;
 
-  if ComboBox1.ItemIndex < 0 then
+  if ComboBox01.ItemIndex < 0 then
   begin
-    Memo1.Lines.Add('请选择合适的MCU型号！');
+    Memo1.Lines.Add('警告: 请选择合适的MCU型号！');
     Exit;
   end;
 
   // 打开文件
+  if FileExists(BinFileL) then
+    FileLStream := TFileStream.Create(BinFileL, fmOpenRead or fmShareDenyWrite);
   if FileExists(BinFileA) then
     FileAStream := TFileStream.Create(BinFileA, fmOpenRead or fmShareDenyWrite);
   if FileExists(BinFileB) then
     FileBStream := TFileStream.Create(BinFileB, fmOpenRead or fmShareDenyWrite);
-  if FileExists(BinFileL) then
-    FileLStream := TFileStream.Create(BinFileL, fmOpenRead or fmShareDenyWrite);
 
+  if FileLStream <> nil then
+    SizeL := FileLStream.Size;
   if FileAStream <> nil then
     SizeA := FileAStream.Size;
   if FileBStream <> nil then
     SizeB := FileBStream.Size;
-  if FileLStream <> nil then
-    SizeL := FileLStream.Size;
+  SizeMatas := SizeOf(TMetaInfo);
 
   // 偏移冲突检查
   if (SizeL > 0) and (OffsetA < SizeL) then
   begin
-    Memo1.Lines.Add(Format('偏移地址 OffsetA=0x%.8X 小于 L 文件大小=0x%.8X，可能覆盖！', [OffsetA, SizeL]));
+    Memo1.Lines.Add(Format('警告: 偏移地址 OffsetA=0x%.8X 小于 L 文件大小=0x%.8X，可能覆盖！', [OffsetA, SizeL]));
     Exit;
   end;
 
   if (SizeA > 0) and (OffsetB < OffsetA + SizeA) then
   begin
-    Memo1.Lines.Add(Format('偏移地址 OffsetB=0x%.8X 小于 A 文件结束地址=0x%.8X，可能覆盖！', [OffsetB, OffsetA + SizeA]));
+    Memo1.Lines.Add(Format('警告: 偏移地址 OffsetB=0x%.8X 小于 A 文件结束地址=0x%.8X，可能覆盖！', [OffsetB, OffsetA + SizeA]));
     Exit;
   end;
 
   try
     // 调用合并函数
-    MergeBinFiles(BinFileL, BinFileA, BinFileB, BinFileC, OffsetA, OffsetB);
+    MetaInfo := MergeBinFiles(BinFileL, BinFileA, BinFileB, BinFileC, OffsetA, OffsetB);
 
     // 日志输出
+    Memo1.Lines.Add('Start merging files...');
+    Memo1.Lines.Add(Format('%-10s: %s', ['文件 L', BinFileL]));
+    Memo1.Lines.Add(Format('%-10s: %d bytes', ['大小', SizeL]));
+    Memo1.Lines.Add(Format('%-10s: 0x%.8X', ['地址', 0]));
+    Memo1.Lines.Add('');
+
     Memo1.Lines.Add(Format('%-10s: %s', ['文件 A', BinFileA]));
     Memo1.Lines.Add(Format('%-10s: %d bytes', ['大小', SizeA]));
-    Memo1.Lines.Add(Format('%-10s: 0x00000000', ['起始地址']));
+    Memo1.Lines.Add(Format('%-10s: 0x%.8X', ['地址', OffsetA]));
     Memo1.Lines.Add('');
 
-    if SizeB > 0 then
-    begin
-      Memo1.Lines.Add(Format('%-10s: %s', ['文件 B', BinFileB]));
-      Memo1.Lines.Add(Format('%-10s: %d bytes', ['大小', SizeB]));
-      Memo1.Lines.Add(Format('%-10s: 0x%.8X', ['起始地址', OffsetB]));
-      Memo1.Lines.Add('');
-    end;
+    Memo1.Lines.Add(Format('%-10s: %s', ['文件 B', BinFileB]));
+    Memo1.Lines.Add(Format('%-10s: %d bytes', ['大小', SizeB]));
+    Memo1.Lines.Add(Format('%-10s: 0x%.8X', ['地址', OffsetB]));
+    Memo1.Lines.Add('--------------------------------------------------------------------');
 
-    if SizeL > 0 then
-    begin
-      Memo1.Lines.Add(Format('%-10s: %s', ['文件 L', BinFileL]));
-      Memo1.Lines.Add(Format('%-10s: %d bytes', ['大小', SizeL]));
-      Memo1.Lines.Add(Format('%-10s: 0x00000000', ['起始地址']));
-      Memo1.Lines.Add('');
-    end;
+    LogAppInfo('App0', MetaInfo.bank0);
+    LogAppInfo('App1', MetaInfo.bank1);
+    LogAppInfo('App2', MetaInfo.bank2);
 
-    Memo1.Lines.Add('输出文件: ' + BinFileC);
     Memo1.Lines.Add('');
+    Memo1.Lines.Add(Format('%-10s: %d bytes', ['Metas Size', SizeMatas]));
+    Memo1.Lines.Add(Format('%-10s: %d bytes', ['Total Size', (SizeL + SizeA + SizeB + SizeMatas)]));
+    Memo1.Lines.Add('--------------------------------------------------------------------');
 
-    LogAppInfo('App0', App1Info, 0);
-    LogAppInfo('App1', App1Info, OffsetA);
-    LogAppInfo('App2', App2Info, OffsetB);
-
-    Memo1.Lines.Add('Merge Completed.');
+    Memo1.Lines.Add('');
+    Memo1.Lines.Add('Output file: ' + BinFileC);
+    Memo1.Lines.Add('Merge completed successfully! ');
 
   finally
     FreeAndNil(FileAStream);
@@ -550,38 +611,17 @@ begin
   end;
 end;
 
-procedure PaddingFile(FileOut: TFileStream; PaddingSize: Integer);
-var
-  Buffer: array [0 .. 8191] of Byte; // 8KB 缓冲
-  WriteSize: Integer;
-begin
-  if PaddingSize <= 0 then
-  begin
-    MergeBinFrm.Memo1.Lines.Add(Format('Warning: Desired offset 0x%.8X < current position 0x%.8X. Padding skipped.', [PaddingSize, FileOut.Position]));
-    Exit;
-  end;
-
-  FillChar(Buffer, SizeOf(Buffer), $FF);
-
-  while PaddingSize > 0 do
-  begin
-    WriteSize := Min(PaddingSize, SizeOf(Buffer));
-    FileOut.Write(Buffer[0], WriteSize);
-    Dec(PaddingSize, WriteSize);
-  end;
-end;
-
 // Merge two BIN files into one with offset + metadata block at the end
-procedure TMergeBinFrm.MergeBinFiles(const BinLPath, BinAPath, BinBPath, OutputPath: string; OffsetA, OffsetB: Integer);
+function TMergeBinFrm.MergeBinFiles(const BinLPath, BinAPath, BinBPath, OutputPath: string; OffsetA, OffsetB: Integer): TMetaInfo;
 var
   FileL, FileA, FileB, FileOut: TFileStream;
   Buffer: array [0 .. 1023] of Byte;
   ReadSize, PaddingSize, FileLSize, FileASize, FileBSize: Integer;
-  // App0Size, App1Size, App2Size: Integer;
-  CRC0, CRC1, CRC2: UInt32;
+  FileLCRC, FileACRC, FileBCRC: UInt32;
   App0Data, App1Data, App2Data: TBytes;
   ModdelMagicNumber: Integer;
-  Meta: TMetaInfo;
+  MetaInfo: TMetaInfo;
+  App0Info, App1Info, App2Info: TFlashBankInfo;
   data: TBytes;
 begin
   FileA := nil;
@@ -590,12 +630,14 @@ begin
   FileLSize := 0;
   FileASize := 0;
   FileBSize := 0;
-
+  FileLCRC := 0;
+  FileACRC := 0;
+  FileBCRC := 0;
   FillChar(App0Info, SizeOf(App0Info), 0);
   FillChar(App1Info, SizeOf(App1Info), 0);
   FillChar(App2Info, SizeOf(App2Info), 0);
 
-  data := TEncoding.ASCII.GetBytes(Trim(ComboBox1.Text)); // 或 UTF8，根据需要
+  data := TEncoding.ASCII.GetBytes(Trim(ComboBox01.Text)); // 或 UTF8，根据需要
   ModdelMagicNumber := CalculateCRC32(data, Length(data));
 
   if FileExists(BinLPath) then
@@ -622,41 +664,45 @@ begin
     Exit;
 
   FileOut := TFileStream.Create(OutputPath, fmCreate);
+  FileOut.Position := 0; // fmCreate这一步其实不需要，已经在开头。
+  // 如果用 fmOpenWrite，就要自己调用 FileOut.Position := 0;，否则默认光标会在文件末尾。
 
   try
     if (FileL <> nil) and (FileLSize > 0) then
     begin
       SetLength(App0Data, FileLSize);
       FileL.ReadBuffer(App0Data[0], FileLSize);
-      CRC0 := CalculateCRC32(App0Data, FileLSize);
+      FileLCRC := CalculateCRC32(App0Data, FileLSize);
       FileOut.WriteBuffer(App0Data[0], FileLSize);
-      PaddingFile(FileOut, OffsetA - FileOut.Position);
-      App0Info := MakeAppInfo(ModdelMagicNumber, 0, FileLSize, CRC0);
     end;
 
     if (FileA <> nil) and (FileASize > 0) then
     begin
+      PaddingFile(FileOut, OffsetA - FileOut.Position);
       SetLength(App1Data, FileASize);
       FileA.ReadBuffer(App1Data[0], FileASize);
-      CRC1 := CalculateCRC32(App1Data, FileASize);
+      FileACRC := CalculateCRC32(App1Data, FileASize);
       FileOut.WriteBuffer(App1Data[0], FileASize);
-      PaddingFile(FileOut, OffsetB - FileOut.Position);
-      App1Info := MakeAppInfo(ModdelMagicNumber, OffsetA, FileASize, CRC1);
     end;
 
     if (FileB <> nil) and (FileBSize > 0) then
     begin
+      PaddingFile(FileOut, OffsetB - FileOut.Position);
       SetLength(App2Data, FileBSize);
       FileB.ReadBuffer(App2Data[0], FileBSize);
-      CRC2 := CalculateCRC32(App2Data, FileBSize);
+      FileBCRC := CalculateCRC32(App2Data, FileBSize);
       FileOut.WriteBuffer(App2Data[0], FileBSize);
-      App2Info := MakeAppInfo(ModdelMagicNumber, OffsetB, FileBSize, CRC2);
     end;
 
-    Meta.bank0 := App0Info;
-    Meta.bank1 := App1Info;
-    Meta.bank2 := App2Info;
-    FileOut.WriteBuffer(Meta, SizeOf(Meta));
+    PaddingFile(FileOut, SizeOf(TMetaInfo));
+    App0Info := MakeAppInfo(ModdelMagicNumber, 0, FileLSize, FileLCRC);
+    App1Info := MakeAppInfo(ModdelMagicNumber, OffsetA, FileASize, FileACRC);
+    App2Info := MakeAppInfo(ModdelMagicNumber, OffsetB, FileBSize, FileBCRC);
+    MetaInfo.bank0 := App0Info;
+    MetaInfo.bank1 := App1Info;
+    MetaInfo.bank2 := App2Info;
+    FileOut.WriteBuffer(MetaInfo, SizeOf(TMetaInfo));
+    Result := MetaInfo;
   finally
     if FileL <> nil then
       FileL.Free;

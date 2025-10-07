@@ -168,14 +168,14 @@
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司 (Shenzhen ZhuChaoTechnology Co., LTD );FileDescription=八爪鱼串口调试开发助手 (Octopus Usart Debugging and Development Assistant);FileVersion=5.2.1.301;InternalName=Octopus;LegalCopyright=2023-2030;LegalTrademarks=八爪鱼软件;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.1;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司 (Shenzhen ZhuChaoTechnology Co., LTD );FileDescription=八爪鱼串口调试开发助手 (Octopus Usart Debugging and Development Assistant);FileVersion=5.2.1.328;InternalName=Octopus;LegalCopyright=2023-2030;LegalTrademarks=八爪鱼软件;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.1;Comments=http://www.1234998.top</VerInfo_Keys>
         <VerInfo_MajorVer>5</VerInfo_MajorVer>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
         <Icon_MainIcon>..\ICO\Octopus_Icon3.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>..\ICO\79c25bc8359f51a4_white.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>..\ICO\79c25bc8359f51a4_white.png</UWP_DelphiLogo150>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Build>301</VerInfo_Build>
+        <VerInfo_Build>328</VerInfo_Build>
         <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -208,12 +208,12 @@
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司(Shenzhen ZhuChaoTechnology Co., LTD);FileDescription=八爪鱼串口调试开发助手(Octopus serial port debugging and development assistant );FileVersion=5.2.0.189;InternalName=BZY;LegalCopyright=2023-2030;LegalTrademarks=BZY;OriginalFilename=BZY64.EXE;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.0;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司(Shenzhen ZhuChaoTechnology Co., LTD);FileDescription=八爪鱼串口调试开发助手(Octopus serial port debugging and development assistant );FileVersion=5.2.0.191;InternalName=BZY;LegalCopyright=2023-2030;LegalTrademarks=BZY;OriginalFilename=BZY64.EXE;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=5.2.0;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <VerInfo_MajorVer>5</VerInfo_MajorVer>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Build>189</VerInfo_Build>
+        <VerInfo_Build>191</VerInfo_Build>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

@@ -431,7 +431,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 430
       Height = 531
-      ActivePage = TabSheet_ProtocolData
+      ActivePage = TabSheet_BatchData
       Align = alClient
       TabHeight = 30
       TabOrder = 0
